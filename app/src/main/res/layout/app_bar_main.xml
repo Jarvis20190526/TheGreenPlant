@@ -19,13 +19,14 @@
             android:layout_height="wrap_content"
             android:background="@color/importance"
             app:popupTheme="@style/AppTheme.PopupOverlay">
-            <TextView
+            <com.example.a95795.thegreenplant.custom.SecretTextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:text="环境监测"
-                android:textStyle="bold"
-                android:textSize="22sp" />
+                android:textSize="22dp"
+                />
 
         </android.support.v7.widget.Toolbar>
 

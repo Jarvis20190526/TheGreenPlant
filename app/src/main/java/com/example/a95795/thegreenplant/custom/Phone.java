@@ -6,23 +6,35 @@ package com.example.a95795.thegreenplant.custom;
 
 public class Phone {
      private String number;
+    private String Mac;
 
-    public Phone(String number) {
-        this.number = number;
+    @Override
+    public String toString() {
+        return "Phone{" +
+                "number='" + number + '\'' +
+                ", Mac='" + Mac + '\'' +
+                '}';
     }
 
     public String getNumber() {
         return number;
     }
 
-    @Override
-    public String toString() {
-        return "Phone{" +
-                "number='" + number + '\'' +
-                '}';
-    }
-
     public void setNumber(String number) {
         this.number = number;
     }
+
+    public String getMac() {
+        return Mac;
+    }
+
+    public void setMac(String mac) {
+        Mac = mac;
+    }
+
+    public Phone(String number, String mac) {
+        this.number = number;
+        Mac = mac;
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.a95795.thegreenplant.custom;
 
+import java.util.Date;
+
 /**
  * Created by 95795 on 2019-04-17.
  */
@@ -7,23 +9,25 @@ package com.example.a95795.thegreenplant.custom;
 public class User {
     private Integer id;
 
-    private String name;
+    private Integer userId;
 
-    private String jj;
+    private String userName;
 
-    private String pic;
+    private Integer userSex;
 
-    private String test;
+    private String userCall;
 
-    private String userid;
+    private Date userFirstjob;
 
-    private String password;
+    private Integer userWork;
 
-    private String numberid;
+    private Integer userWorkshop;
 
-    private String number;
+    private String userPassword;
 
-    private String phone;
+    private String userNum;
+
+    private String userNumberId;
 
     public Integer getId() {
         return id;
@@ -33,75 +37,83 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public String getJj() {
-        return jj;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setJj(String jj) {
-        this.jj = jj == null ? null : jj.trim();
+    public void setUserName(String userName) {
+        this.userName = userName == null ? null : userName.trim();
     }
 
-    public String getPic() {
-        return pic;
+    public Integer getUserSex() {
+        return userSex;
     }
 
-    public void setPic(String pic) {
-        this.pic = pic == null ? null : pic.trim();
+    public void setUserSex(Integer userSex) {
+        this.userSex = userSex;
     }
 
-    public String getTest() {
-        return test;
+    public String getUserCall() {
+        return userCall;
     }
 
-    public void setTest(String test) {
-        this.test = test == null ? null : test.trim();
+    public void setUserCall(String userCall) {
+        this.userCall = userCall == null ? null : userCall.trim();
     }
 
-    public String getUserid() {
-        return userid;
+    public Date getUserFirstjob() {
+        return userFirstjob;
     }
 
-    public void setUserid(String userid) {
-        this.userid = userid == null ? null : userid.trim();
+    public void setUserFirstjob(Date userFirstjob) {
+        this.userFirstjob = userFirstjob;
     }
 
-    public String getPassword() {
-        return password;
+    public Integer getUserWork() {
+        return userWork;
     }
 
-    public void setPassword(String password) {
-        this.password = password == null ? null : password.trim();
+    public void setUserWork(Integer userWork) {
+        this.userWork = userWork;
     }
 
-    public String getNumberid() {
-        return numberid;
+    public Integer getUserWorkshop() {
+        return userWorkshop;
     }
 
-    public void setNumberid(String numberid) {
-        this.numberid = numberid == null ? null : numberid.trim();
+    public void setUserWorkshop(Integer userWorkshop) {
+        this.userWorkshop = userWorkshop;
     }
 
-    public String getNumber() {
-        return number;
+    public String getUserPassword() {
+        return userPassword;
     }
 
-    public void setNumber(String number) {
-        this.number = number == null ? null : number.trim();
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword == null ? null : userPassword.trim();
     }
 
-    public String getPhone() {
-        return phone;
+    public String getUserNum() {
+        return userNum;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone == null ? null : phone.trim();
+    public void setUserNum(String userNum) {
+        this.userNum = userNum == null ? null : userNum.trim();
+    }
+
+    public String getUserNumberId() {
+        return userNumberId;
+    }
+
+    public void setUserNumberId(String userNumberId) {
+        this.userNumberId = userNumberId == null ? null : userNumberId.trim();
     }
 }

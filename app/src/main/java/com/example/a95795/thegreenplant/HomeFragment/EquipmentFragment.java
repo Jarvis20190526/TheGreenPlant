@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,12 +26,15 @@ import com.example.a95795.thegreenplant.R;
 import com.example.a95795.thegreenplant.adapter.EquipmentAdapter;
 import com.example.a95795.thegreenplant.custom.Equipment_Dianji;
 import com.example.a95795.thegreenplant.custom.MyApplication;
+import com.example.a95795.thegreenplant.custom.Phone;
+import com.example.a95795.thegreenplant.custom.WorkShopJudge;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.liaoinstan.springview.container.DefaultHeader;
 import com.liaoinstan.springview.widget.SpringView;
 
 import org.angmarch.views.NiceSpinner;
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,10 +43,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import me.yokeyword.fragmentation.SupportFragment;
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EquipmentFragment extends Fragment {
+public class EquipmentFragment extends SupportFragment {
 
     private NiceSpinner niceSpinner;
     public static EquipmentFragment newInstance() {
@@ -84,6 +90,8 @@ public class EquipmentFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(EquipmentFragment.this.getActivity(),"点击了第"+(1 + position)+"个",Toast.LENGTH_LONG).show();
+                EventBus.getDefault().postSticky(new WorkShopJudge((1+position)));
+                replaceFragment(new EquipmentItemFragment());
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
@@ -95,6 +103,7 @@ public class EquipmentFragment extends Fragment {
         springView.setHeader(new DefaultHeader(this.getActivity()));
 
     }
+
     public void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -113,7 +122,6 @@ public class EquipmentFragment extends Fragment {
 
                 handler.sendEmptyMessageDelayed(0,1000);
             }
-
             @Override
             public void onLoadmore() {
 

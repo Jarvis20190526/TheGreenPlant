@@ -15,6 +15,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.a95795.thegreenplant.MainActivity;
 import com.example.a95795.thegreenplant.R;
+import com.example.a95795.thegreenplant.custom.Mac;
 import com.example.a95795.thegreenplant.custom.Message;
 import com.example.a95795.thegreenplant.custom.MyApplication;
 import com.example.a95795.thegreenplant.custom.Phone;
@@ -32,16 +33,19 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.yokeyword.fragmentation.SupportFragment;
 import me.yokeyword.swipebackfragment.SwipeBackFragment;
 
 
-public class MessageFragment extends SwipeBackFragment {
+public class MessageFragment extends SupportFragment {
 
     private EditText name,ID,job_number;
-    private String Name,Id,Job_Number,Phone;
+    private String Id,Job_Number,Phone,Mac;
     private Button button;
     private int id;
-
+    public static MessageFragment newInstance() {
+        return new MessageFragment();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,11 +54,12 @@ public class MessageFragment extends SwipeBackFragment {
 
        init(view);messageButton();
         EventBus.getDefault().register(this);
-        return attachToSwipeBack(view);
+        return view;
     }
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onMessageEvent(Phone phone) {
        Phone = phone.getNumber();
+       Mac = phone.getMac();
     }
     @Override
     public void onDestroy() {
@@ -67,18 +72,12 @@ public class MessageFragment extends SwipeBackFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Name = name.getText().toString();
-                Id = ID.getText().toString()
-                ;
+                Id = ID.getText().toString();
                 Job_Number = job_number.getText().toString();
                 if (Job_Number.equals("")){
                     job_number.setError("工号为空");
-                }else if (Name.equals("")){
-                    name.setError("姓名为空");
                 }else if (Id.equals("")){
                     ID.setError("身份证为空");
-                }else if(!isChinese(Name)){
-                    name.setError("姓名不合法");
                 }else if(Id.length() != 18){
                     ID.setError("身份证长度不合法");
                 }else if(!isIDNumber(Id)) {
@@ -91,18 +90,20 @@ public class MessageFragment extends SwipeBackFragment {
     }
     //初始化
     public void init(View view){
-        name = (EditText) view.findViewById(R.id.codeeditText);
         ID = (EditText) view.findViewById(R.id.ID_EditText);
         job_number = (EditText) view.findViewById(R.id.phonenumber_test);
         button = (Button) view.findViewById(R.id.next);
     }
     //验证工号是否存在
     public void acquire(){
-        String url = getString(R.string.ip)+"user/userfindnumber?number="+Job_Number;
+
+        String url = getString(R.string.ip)+"user/userfindnumber";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
-                "",
+                "{\n" +
+                        "\t\"userId\":"+Job_Number+"\n" +
+                        "}",
                 new Response.Listener<JSONObject>(){
                     @Override
                     public void onResponse(JSONObject response) {
@@ -115,8 +116,9 @@ public class MessageFragment extends SwipeBackFragment {
                             }else {
                                 List<User> subjectList = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
                                 id = subjectList.get(0).getId();
-                                EventBus.getDefault().postSticky(new Message(Name,Id,id,Job_Number,Phone));
-                                ((MainActivity ) getActivity()).replaceFragment(new EndMessageFragment());
+                                Log.d("11111111", "onResponse: "+Id+Job_Number+Phone);
+                                EventBus.getDefault().postSticky(new Message(Id,id,Job_Number,Phone,Mac));
+                                start(EndMessageFragment.newInstance());
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

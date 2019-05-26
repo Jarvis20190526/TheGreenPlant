@@ -24,7 +24,9 @@ import com.example.a95795.thegreenplant.HomeFragment.EnvironmentFragment;
 import com.example.a95795.thegreenplant.HomeFragment.EquipmentFragment;
 import com.example.a95795.thegreenplant.HomeFragment.HomeFragment;
 import com.example.a95795.thegreenplant.HomeFragment.PersonageFragment;
+import com.example.a95795.thegreenplant.Login.LoginFragment;
 import com.example.a95795.thegreenplant.adapter.MyPagerAdapter;
+import com.example.a95795.thegreenplant.custom.SecretTextView;
 import com.example.a95795.thegreenplant.custom.StatusBarCompat;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
@@ -37,14 +39,17 @@ import me.yokeyword.fragmentation.SupportActivity;
 public class HomeActivity extends SupportActivity
 
         implements NavigationView.OnNavigationItemSelectedListener {
+    SecretTextView secretTextView;
 
+    public static HomeActivity newInstance() {
+        return new HomeActivity();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        final TextView textView = (TextView) findViewById(R.id.textView);
         toolbar.setTitle("");
         StatusBarCompat.compat(this, Color.parseColor("#FF16A295"));
         setSupportActionBar(toolbar);
@@ -52,11 +57,14 @@ public class HomeActivity extends SupportActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
-
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         loadRootFragment(R.id.home, HomeFragment.newInstance()); //activity初始加载HomeFragment
+        secretTextView = (SecretTextView)findViewById(R.id.textView);
+        secretTextView.setDuration(1000);
+        secretTextView.setIsVisible(true);
+
 
 
     }
@@ -110,6 +118,29 @@ public class HomeActivity extends SupportActivity
         return true;
     }
 
+    public void test(int number) {
+        switch (number) {
+            case 1:
+                secretTextView.hide();
+                secretTextView.setText("环境监测");
+                secretTextView.show();
+                break;
+            case 2:
+                secretTextView.hide();
+                secretTextView.setText("设备监测");
+                secretTextView.show();
+
+                break;
+            case 3:
+                secretTextView.hide();
+                secretTextView.setText("个人中心");
+                secretTextView.show();
+            default:
+                break;
+        }
+    }
+
+
     public void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -117,7 +148,6 @@ public class HomeActivity extends SupportActivity
         transaction.addToBackStack(null);
         transaction.commit();
     }
-
 
 
 }

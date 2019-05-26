@@ -5,29 +5,30 @@ package com.example.a95795.thegreenplant.custom;
  */
 
 public class Message {
-    private String Name;
+
     private String Id;
     private int thisId;
     private String Job_Number;
     private String Phone;
+    private String Mac;
+
+    public Message(String id, int thisId, String job_Number, String phone, String mac) {
+        Id = id;
+        this.thisId = thisId;
+        Job_Number = job_Number;
+        Phone = phone;
+        Mac = mac;
+    }
 
     @Override
     public String toString() {
         return "Message{" +
-                "Name='" + Name + '\'' +
-                ", Id='" + Id + '\'' +
+                "Id='" + Id + '\'' +
                 ", thisId=" + thisId +
                 ", Job_Number='" + Job_Number + '\'' +
                 ", Phone='" + Phone + '\'' +
+                ", Mac='" + Mac + '\'' +
                 '}';
-    }
-
-    public String getName() {
-        return Name;
-    }
-
-    public void setName(String name) {
-        Name = name;
     }
 
     public String getId() {
@@ -62,11 +63,11 @@ public class Message {
         Phone = phone;
     }
 
-    public Message(String name, String id, int thisId, String job_Number, String phone) {
-        Name = name;
-        Id = id;
-        this.thisId = thisId;
-        Job_Number = job_Number;
-        Phone = phone;
+    public String getMac() {
+        return Mac;
+    }
+
+    public void setMac(String mac) {
+        Mac = mac;
     }
 }

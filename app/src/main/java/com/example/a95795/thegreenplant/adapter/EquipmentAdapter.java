@@ -17,7 +17,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.a95795.thegreenplant.R;
 import com.example.a95795.thegreenplant.custom.Equipment_Dianji;
+import com.example.a95795.thegreenplant.custom.Machine;
 import com.example.a95795.thegreenplant.custom.MyApplication;
+import com.example.a95795.thegreenplant.custom.Workshop;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.nightonke.jellytogglebutton.JellyToggleButton;
@@ -35,6 +37,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static com.mob.MobSDK.getContext;
 import static com.mob.tools.utils.Strings.getString;
+import static com.nightonke.jellytogglebutton.JellyTypes.Jelly.ACTIVE_TREMBLE_BODY_SLIM_JIM;
 import static com.nightonke.jellytogglebutton.JellyTypes.Jelly.LAZY_TREMBLE_TAIL_SLIM_JIM;
 
 /**
@@ -42,16 +45,15 @@ import static com.nightonke.jellytogglebutton.JellyTypes.Jelly.LAZY_TREMBLE_TAIL
  */
 
 public class EquipmentAdapter extends BaseExpandableListAdapter {
-    public String[] groupString = {"电机", "空调", "PM2.5监测", "CO2监测"};
-    public String[][] childString = new String[4][4];
-    public List<Equipment_Dianji> list;
+    public String[] groupString = {"电机（PRO）"};
+    public String[][] childString = new String[1][3];
+    public List<Machine> list;
 
     //重写构造方法
-    public EquipmentAdapter(List<Equipment_Dianji> objects) {
+    public EquipmentAdapter(List<Machine> objects) {
         this.list = objects;
-        for (int i = 0; i < 4; i++) {
-            childString[0][i] = list.get(i).getEquipmentDianji();
-
+        for (int i = 0; i < 3; i++) {
+            childString[0][i] = list.get(i).getMachineType()+list.get(i).getMachineId();
         }
     }
 
@@ -144,24 +146,24 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
 
     //点击类——> 监听设备点击位置
     class MyListener {
-        int group, child;
+        int group, child,MachineId;
         String IP;
 
-        public MyListener(int groupPosition, int childPosition,String ip) {
+        public MyListener(int groupPosition, int childPosition,String ip,int machineId) {
             group = groupPosition;
             child = childPosition;
             IP = ip;
+            MachineId = machineId;
         }
 
         public void left() {
-            String url = IP+"user/equipment_update";
+            String url = IP+"user/MachineUpdata";
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.POST,
                     url,
                     "{\n" +
-                            "\t\"id\":\"" + (1 + child) + "\",\n" +
-                            "\t\"equipmentDianji\": \"" + childString[group][child] + "\",\n" +
-                            "\t\"equipmentNow\":\"0\"\n" +
+                            "\t\"machineSwitch\":0,\n" +
+                            "\t\"machineId\":"+MachineId+"\n" +
                             "\n" +
                             "}",
                     new Response.Listener<JSONObject>() {
@@ -181,14 +183,13 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
         }
 
         public void right() {
-            String url =  IP+"user/equipment_update";
+            String url =  IP+"user/MachineUpdata";
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.POST,
                     url,
                     "{\n" +
-                            "\t\"id\":\"" + (1 + child) + "\",\n" +
-                            "\t\"equipmentDianji\": \"" + childString[group][child] + "\",\n" +
-                            "\t\"equipmentNow\":\"1\"\n" +
+                            "\t\"machineSwitch\":1,\n" +
+                            "\t\"machineId\":"+MachineId+"\n" +
                             "\n" +
                             "}",
                     new Response.Listener<JSONObject>() {
@@ -224,26 +225,33 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
             textView.setText(childString[group][child]);
 
             //设备图片
-            ImageLoader.getInstance().displayImage(convertView.getContext().getString(R.string.ip) + list.get(child).getEquipmentPic(), image, MyApplication.getLoaderOptions());
+            ImageLoader.getInstance().displayImage(convertView.getContext().getString(R.string.ip) + "img/dianji.png", image, MyApplication.getLoaderOptions());
             //将位置传给Mylistener,EquipmentNow
-            final EquipmentAdapter.MyListener myListener = new EquipmentAdapter.MyListener(group, child,convertView.getContext().getString(R.string.ip));
             EquipmentAdapter.EquipmentNow equipmentNow = new EquipmentAdapter.EquipmentNow(group, child);
+            final EquipmentAdapter.MyListener myListener = new EquipmentAdapter.MyListener(group, child,convertView.getContext().getString(R.string.ip),list.get(child).getMachineId());
+
             //判断设备状况
-            if (list.get(child).getEquipmentNow().equals("0")) {
-                //隐藏警告按钮
-                imageView.setVisibility(View.INVISIBLE);
-                jellyToggleButton.setChecked(false, false);
-            } else if (list.get(child).getEquipmentNow().equals("1")) {
-                //同上
-                imageView.setVisibility(View.INVISIBLE);
-                jellyToggleButton.setChecked(true, false);
-            }
-            if (list.get(child).getEquipmentNow().equals("2")) {
-                jellyToggleButton.setChecked(false, false);
+            if ((list.get(child).getMachineFs()==1)) {
+                jellyToggleButton.setCheckedImmediately( false, false );
                 //设置按钮不可以点击
                 jellyToggleButton.setEnabled(false);
                 imageView.setOnClickListener(equipmentNow);
-            }
+            } else if ((list.get(child).getMachineSwitch()==0)) {
+                if((list.get(child).getMachineFs()==0)){
+                    //隐藏警告按钮
+                    imageView.setVisibility(View.INVISIBLE);
+                    jellyToggleButton.setChecked(false, false);
+                }
+            } else if (list.get(child).getMachineSwitch()==1) {
+                //同上
+                if((list.get(child).getMachineFs()==0)){
+                    //隐藏警告按钮
+                    imageView.setVisibility(View.INVISIBLE);
+                    jellyToggleButton.setChecked(true, false);
+                }
+
+        }
+
             //启动果冻滑动按钮
             jellyToggleButton.setJelly(Jelly.ITSELF);
             //背景为白色
@@ -253,7 +261,7 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
             //打开为绿色按钮
             jellyToggleButton.setRightThumbColorRes(R.color.green);
             //粘稠果冻效果
-            jellyToggleButton.setJelly(LAZY_TREMBLE_TAIL_SLIM_JIM);
+            jellyToggleButton.setJelly(ACTIVE_TREMBLE_BODY_SLIM_JIM);
             jellyToggleButton.setOnStateChangeListener(new JellyToggleButton.OnStateChangeListener() {
                 @Override
                 public void onStateChange(float process, State state, JellyToggleButton jtb) {
@@ -281,7 +289,7 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
         public void onClick(View v) {
             new SweetAlertDialog(v.getContext(), SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("警告")
-                    .setContentText("[" + childString[GroupPosition][ChildPosition] + "]     机器出现未知故障，请立即检查！")
+                    .setContentText("[" + childString[GroupPosition][ChildPosition] + "]机器出现未知故障，请立即检查！")
                     .setConfirmText("确定")
                     .show();
         }
