@@ -2,19 +2,35 @@ package com.example.a95795.thegreenplant;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.a95795.thegreenplant.custom.AndroidWorkaround;
+import com.example.a95795.thegreenplant.custom.Id;
+import com.example.a95795.thegreenplant.custom.MyApplication;
 import com.example.a95795.thegreenplant.register.EndMessageFragment;
 import com.example.a95795.thegreenplant.Login.LoginFragment;
 import com.example.a95795.thegreenplant.register.MessageFragment;
 import com.example.a95795.thegreenplant.register.PhoneFragment;
 
+import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.yokeyword.fragmentation.SupportActivity;
 import me.yokeyword.fragmentation.anim.DefaultHorizontalAnimator;
 import me.yokeyword.fragmentation.anim.FragmentAnimator;
@@ -26,10 +42,14 @@ public class MainActivity extends SupportActivity  {
     private PhoneFragment phonefragment;
     private EndMessageFragment endMessageFragment;
     private LoginFragment loginFragment;
+    private String num;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        web();
+
+
         //适配三大虚拟键 避免遮盖控件
         if (AndroidWorkaround.checkDeviceHasNavigationBar(this)) {
             AndroidWorkaround.assistActivity(findViewById(android.R.id.content));
@@ -52,6 +72,67 @@ public class MainActivity extends SupportActivity  {
         transaction.replace(R.id.Home, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+    //网络是否正确
+    public void web(){
+        num = "0";
+        String url = getString(R.string.ip) + "user/Web";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                "",
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String UserList;
+                            UserList = response.getString("UserList");
+                            if (UserList.equals("1")) {
+                                SharedPreferences rememberUser = getSharedPreferences("login", MODE_PRIVATE);//获取模式
+                                SharedPreferences.Editor edit = rememberUser.edit();
+                                edit.putString("name", "1");
+                                edit.commit();
+
+                            } else {
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("volley", error.toString());
+                    }
+                }
+        );
+        MyApplication.addRequest(jsonObjectRequest, "MainActivity");
+        SharedPreferences sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
+        String name_str = sharedPreferences.getString("name", "");
+        Log.d("11111111", "web: "+name_str);
+        Log.d("111111111", "web: "+num);
+        num = name_str;
+        Log.d("11111111", "web: "+name_str);
+        Log.d("111111111", "web: "+num);
+        if(num.equals("1")){
+
+        }else {
+            new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
+                    .setTitleText("提示")
+                    .setContentText("您的网络出现问题，请检查网络设置！")
+                    .setConfirmText("确定")
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sDialog) {
+                            Intent intent =  new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS);
+                            startActivity(intent);
+                            finish();
+                        }
+                    })
+                    .show();
+        }
     }
     //显示和隐藏fragment
     public void setClick(int type) {

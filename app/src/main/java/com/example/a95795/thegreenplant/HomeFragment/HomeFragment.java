@@ -2,7 +2,9 @@ package com.example.a95795.thegreenplant.HomeFragment;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -26,24 +28,36 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.a95795.thegreenplant.HomeActivity;
 import com.example.a95795.thegreenplant.MainActivity;
 import com.example.a95795.thegreenplant.R;
 import com.example.a95795.thegreenplant.adapter.MyPagerAdapter;
 import com.example.a95795.thegreenplant.custom.Id;
+import com.example.a95795.thegreenplant.custom.MyApplication;
 import com.example.a95795.thegreenplant.custom.StatusBarCompat;
+import com.example.a95795.thegreenplant.custom.User;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabClickListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import me.yokeyword.fragmentation.SupportActivity;
 import me.yokeyword.fragmentation.SupportFragment;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class HomeFragment extends SupportFragment {
@@ -53,9 +67,9 @@ public class HomeFragment extends SupportFragment {
     private EquipmentFragment equipmentFragment;
     private Information information;
     private ViewPager viewPager;
-    private int ID=0;
     private CoordinatorLayout mCoordinator;
     private List<Fragment> fragmentList;
+
 
 
     public static HomeFragment newInstance() {
@@ -66,11 +80,10 @@ public class HomeFragment extends SupportFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
         //沉浸式状态栏
         StatusBarCompat.compat(HomeFragment.this.getActivity(), Color.parseColor("#FF16A295"));
-        EventBus.getDefault().register(this);
         mCoordinator = (CoordinatorLayout) view.findViewById(R.id.mCoordinator);
-        Log.d("1111111", "onCreateView: "+ID);
         viewPager = (ViewPager) view.findViewById(R.id.viewPager);
         initViewPager();
         mBottomBar = BottomBar.attachShy(mCoordinator, viewPager, savedInstanceState);
@@ -138,18 +151,6 @@ public class HomeFragment extends SupportFragment {
             }
         });
 
-    }
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onMessageEvent(Id id) {
-     ID = id.getId();
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // 注销订阅者
-        EventBus.getDefault().unregister(this);
     }
 
 

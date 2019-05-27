@@ -1,11 +1,14 @@
 package com.example.a95795.thegreenplant.Login;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -38,8 +41,11 @@ import com.example.a95795.thegreenplant.register.PhoneFragment;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lusfold.spinnerloading.SpinnerLoading;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -56,6 +62,9 @@ import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.yokeyword.fragmentation.SupportFragment;
 
+import static android.content.Context.MODE_PRIVATE;
+import static android.content.Context.MODE_WORLD_READABLE;
+
 
 public class LoginFragment extends SupportFragment {
     private CustomVideoView videoview;
@@ -67,6 +76,8 @@ public class LoginFragment extends SupportFragment {
     private Button button;
     private ImageView imageView;
     File file = null;
+    private int num ;
+    private SpinnerLoading spinnerLoading;
     private TextInputLayout mTILUsername, mTILUsername2;
 
     public static LoginFragment newInstance() {
@@ -84,9 +95,7 @@ public class LoginFragment extends SupportFragment {
         initView();
         registerButton();
         logonButton();
-        imageButton();
         forgetButton();
-
         return view;
     }
 
@@ -110,7 +119,7 @@ public class LoginFragment extends SupportFragment {
         });
     }
 
-    //手机登录按钮
+    /*//手机登录按钮
     public void imageButton() {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,13 +127,14 @@ public class LoginFragment extends SupportFragment {
 
             }
         });
-    }
+    }*/
 
     //登录按钮
     public void logonButton() {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Login();
 
             }
@@ -140,9 +150,10 @@ public class LoginFragment extends SupportFragment {
         mTILUsername = (TextInputLayout) view.findViewById(R.id.textInputLayout);
         mTILUsername2 = (TextInputLayout) view.findViewById(R.id.textInputLayout2);
         videoview = (CustomVideoView) view.findViewById(R.id.videoview);
-        imageView = (ImageView) view.findViewById(R.id.phone);
         textView1 = (TextView) view.findViewById(R.id.tv_register);
         textView2 = (TextView) view.findViewById(R.id.tv_find_pwd);
+        spinKitView = (SpinKitView) view.findViewById(R.id.spin_kit);
+
     }
 
     //获得字符串
@@ -178,13 +189,35 @@ public class LoginFragment extends SupportFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            spinKitView.setVisibility(View.VISIBLE);
+                            Gson gson = new Gson();
                             String UserList;
                             UserList = response.getString("UserList");
                             if (UserList.equals("0")) {
                                 loginPhone();
                             } else {
-                                skip();
                                 Toast.makeText(LoginFragment.this.getActivity(), "登录成功", Toast.LENGTH_LONG).show();
+                                List<User> subjectList = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
+                                final int id  = subjectList.get(0).getId();
+                                remeber();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        spinKitView.setVisibility(View.GONE);
+                                        Intent intent = new Intent(LoginFragment.this.getActivity(), HomeActivity.class);
+                                        Context ctx = LoginFragment.this.getActivity();
+                                        SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+                                        //存入数据
+                                        SharedPreferences.Editor editor = sp.edit();
+                                        editor.putInt("STRING_KEY", id);
+                                        editor.commit();
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                }, 2000);    //延时2s执行
+
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -204,9 +237,7 @@ public class LoginFragment extends SupportFragment {
 
     //跳转主界面
     public void skip() {
-        Intent intent = new Intent(LoginFragment.this.getActivity(), HomeActivity.class);
-        startActivity(intent);
-        getActivity().finish();
+
 
     }
 
@@ -256,8 +287,6 @@ public class LoginFragment extends SupportFragment {
                     file = new File(getContext().getFilesDir(), "info.txt");
                     fos = new FileOutputStream(file);
                     fos.write((name + "##" + pwd).getBytes());
-
-
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -355,16 +384,37 @@ public class LoginFragment extends SupportFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            spinKitView.setVisibility(View.VISIBLE);
                             String UserList;
                             UserList = response.getString("UserList");
-                            Gson gson = new Gson();
+                            final Gson gson = new Gson();
 
                             if (UserList.equals("0")) {
                                 Toast.makeText(LoginFragment.this.getActivity(), "密码错误，请检查账号或密码", Toast.LENGTH_LONG).show();
                             } else {
-                                skip();
                                 Toast.makeText(LoginFragment.this.getActivity(), "登录成功", Toast.LENGTH_LONG).show();
+                                final List<User> subjectList = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
+                                final int id  = subjectList.get(0).getId();
+                                final int work = subjectList.get(0).getUserWork();
                                 remeber();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        spinKitView.setVisibility(View.GONE);
+                                        Intent intent = new Intent(LoginFragment.this.getActivity(), HomeActivity.class);
+                                        Context ctx = LoginFragment.this.getActivity();
+                                        SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+                                        //存入数据
+                                        SharedPreferences.Editor editor = sp.edit();
+                                        editor.putInt("STRING_KEY", id);
+                                        editor.putInt("STRING_KEY2", work);
+                                        editor.commit();
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                }, 2000);    //延时2s执行
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -396,14 +446,34 @@ public class LoginFragment extends SupportFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            spinKitView.setVisibility(View.VISIBLE);
                             String UserList;
+                            Gson gson = new Gson();
                             UserList = response.getString("UserList");
                             if (UserList.equals("0")) {
                                 loginUserid();
                             } else {
-                                skip();
                                 Toast.makeText(LoginFragment.this.getActivity(), "登录成功", Toast.LENGTH_LONG).show();
+                                List<User> subjectList = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
+                                final int id  = subjectList.get(0).getId();
                                 remeber();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        spinKitView.setVisibility(View.GONE);
+                                        Intent intent = new Intent(LoginFragment.this.getActivity(), HomeActivity.class);
+                                        Context ctx = LoginFragment.this.getActivity();
+                                        SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+                                        //存入数据
+                                        SharedPreferences.Editor editor = sp.edit();
+                                        editor.putInt("STRING_KEY", id);
+                                        editor.commit();
+                                        startActivity(intent);
+                                        getActivity().finish();
+
+                                    }
+                                }, 2000);    //延时2s执行
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -420,5 +490,6 @@ public class LoginFragment extends SupportFragment {
         );
         MyApplication.addRequest(jsonObjectRequest, "MainActivity");
     }
+
 
 }

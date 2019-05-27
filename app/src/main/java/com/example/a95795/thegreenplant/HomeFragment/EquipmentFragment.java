@@ -1,6 +1,8 @@
 package com.example.a95795.thegreenplant.HomeFragment;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,11 +24,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.a95795.thegreenplant.HomeActivity;
 import com.example.a95795.thegreenplant.R;
+import com.example.a95795.thegreenplant.adapter.EnvironmentAdapter;
 import com.example.a95795.thegreenplant.adapter.EquipmentAdapter;
 import com.example.a95795.thegreenplant.custom.Equipment_Dianji;
 import com.example.a95795.thegreenplant.custom.MyApplication;
 import com.example.a95795.thegreenplant.custom.Phone;
+import com.example.a95795.thegreenplant.custom.User;
 import com.example.a95795.thegreenplant.custom.WorkShopJudge;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -43,7 +48,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.yokeyword.fragmentation.SupportFragment;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,6 +59,7 @@ import me.yokeyword.fragmentation.SupportFragment;
 public class EquipmentFragment extends SupportFragment {
 
     private NiceSpinner niceSpinner;
+    private int ID;
     public static EquipmentFragment newInstance() {
         return new EquipmentFragment();
     }
@@ -78,6 +87,10 @@ public class EquipmentFragment extends SupportFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
        View view = inflater.inflate(R.layout.fragment_equipment, container, false);
+        Context ctx = EquipmentFragment.this.getActivity();
+        SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+        ID = sp.getInt("STRING_KEY", 0);
+        judge();judge2();
         springView = (SpringView) view.findViewById(R.id.Spview_spbranchList);
         niceSpinner =  view.findViewById(R.id.nice_spinner);
         initData();initEvnet();replaceFragment(new EquipmentItemFragment());
@@ -128,6 +141,80 @@ public class EquipmentFragment extends SupportFragment {
             }
         });
 
+    }
+    public void judge(){
+        String url = getString(R.string.ip) + "user/userfindid";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                "{\n" +
+                        "\t\"id\": "+ID+"\n" +
+                        "}",
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Gson gson = new Gson();
+                            List<User> subjectList = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
+
+                            if (subjectList.get(0).getUserWork()==0){
+                                niceSpinner.setClickable(false);
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("volley", error.toString());
+                    }
+                }
+        );
+        MyApplication.addRequest(jsonObjectRequest, "MainActivity");
+    }
+    public void judge2(){
+        String url = getString(R.string.ip) + "user/userfindid";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                "{\n" +
+                        "\t\"id\": "+ID+"\n" +
+                        "}",
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Gson gson = new Gson();
+                            List<User> subjectList = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
+                            if (subjectList.get(0).getUserWork()==0){
+                                new SweetAlertDialog(EquipmentFragment.this.getActivity(), SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+                                        .setTitleText("提醒")
+                                        .setContentText("你好，"+subjectList.get(0).getUserName()+"生产员，你以登录系统，你可以查看自己车间的相应信息，没有更改的权限")
+                                        .setCustomImage(R.drawable.ren)
+                                        .show();
+                            }else {
+                                new SweetAlertDialog(EquipmentFragment.this.getActivity(), SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+                                        .setTitleText("提醒")
+                                        .setContentText("您好，尊敬的"+subjectList.get(0).getUserName()+"管理员，您已获得软件的全部权限")
+                                        .setCustomImage(R.drawable.vip)
+                                        .show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("volley", error.toString());
+                    }
+                }
+        );
+        MyApplication.addRequest(jsonObjectRequest, "MainActivity");
     }
 
 

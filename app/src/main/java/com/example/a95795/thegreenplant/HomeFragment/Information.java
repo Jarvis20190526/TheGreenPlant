@@ -1,6 +1,9 @@
 package com.example.a95795.thegreenplant.HomeFragment;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,6 +20,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.eminayar.panter.PanterDialog;
+import com.example.a95795.thegreenplant.MainActivity;
 import com.example.a95795.thegreenplant.R;
 import com.example.a95795.thegreenplant.custom.MyApplication;
 import com.example.a95795.thegreenplant.custom.User;
@@ -30,9 +34,12 @@ import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
+import me.yokeyword.fragmentation.SupportFragment;
 import ru.katso.livebutton.LiveButton;
 
-public class Information extends Fragment {
+import static android.content.Context.MODE_PRIVATE;
+
+public class Information extends SupportFragment {
 
     private ImageView mHBack;
     private ImageView mHHead;
@@ -45,7 +52,7 @@ public class Information extends Fragment {
     private ItemView mJob;
     private ItemView mWorkshop;
     private LiveButton exit;
-
+    private int ID;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,7 +69,9 @@ public class Information extends Fragment {
         set();
         setData();
         initView();
-
+        Context ctx = Information.this.getActivity();
+        SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+        ID = sp.getInt("STRING_KEY", 0);
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,6 +79,8 @@ public class Information extends Fragment {
                         .setPositive("确定", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                Intent intent = new Intent(Information.this.getActivity(), MainActivity.class);
+                                startActivity(intent);
                                 getActivity().finish();
                             }
                         })
@@ -131,11 +142,11 @@ public class Information extends Fragment {
     }
 
     private void initView() {
-        String url = getString(R.string.ip)+"user/userall";
+        String url = getString(R.string.ip)+"user/userfindid";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
-                "{}",
+                "",
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -143,18 +154,16 @@ public class Information extends Fragment {
                         try {
                             List<User> producttype = new Gson().fromJson(response.getString("UserList"), new TypeToken<List<User>>() {
                             }.getType());
-                            for (int i=0;i<producttype.size();i++){
-                                if (producttype.get(i).getUserId()==101000){
-                                    mNickName.setRightDesc(producttype.get(i).getUserName());
-                                    mTelephone.setRightDesc(producttype.get(i).getUserCall()+"");
-                                    if(producttype.get(i).getUserWork()==0){
+                                    mNickName.setRightDesc(producttype.get(0).getUserName());
+                                    mTelephone.setRightDesc(producttype.get(0).getUserCall()+"");
+                                    if(producttype.get(0).getUserWork()==0){
                                         mJob.setRightDesc("生产员");
                                         mWorkshop.setRightDesc("生产员无管理车间");
                                     }else{
                                         mJob.setRightDesc("管理员");
-                                        mWorkshop.setRightDesc(producttype.get(i).getUserWorkshop()+"");
+                                        mWorkshop.setRightDesc(producttype.get(0).getUserWorkshop()+"");
                                     }
-                                    if (producttype.get(i).getUserSex()==0) {
+                                    if (producttype.get(0).getUserSex()==0) {
                                         mSex.setRightDesc("男");
                                     }else{
                                         mSex.setRightDesc("女");
@@ -169,9 +178,9 @@ public class Information extends Fragment {
                                    /* Date date=producttype.get(i).getUserFirstjob();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                     mTime.setRightDesc(sdf.format(date));*/
-                                }
 
-                            }
+
+
 //                           HocellAdapter myAdapter=new HocellAdapter(producttype,R.layout.hocell);
 //                           LinearLayoutManager manager=new LinearLayoutManager(getActivity());
 //                           manager.setOrientation(LinearLayoutManager.HORIZONTAL);

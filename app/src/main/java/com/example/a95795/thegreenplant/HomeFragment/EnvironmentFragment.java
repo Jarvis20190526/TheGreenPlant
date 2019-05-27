@@ -33,11 +33,13 @@ import com.liaoinstan.springview.widget.SpringView;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.yokeyword.fragmentation.SupportFragment;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EnvironmentFragment extends Fragment implements View.OnClickListener {
+public class EnvironmentFragment extends SupportFragment implements View.OnClickListener {
     private int i = 1;
     private LinearLayout ll_chart_table;
     private ImageView imageView_ct;

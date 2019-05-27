@@ -1,6 +1,8 @@
 package com.example.a95795.thegreenplant.HomeFragment;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -29,6 +31,7 @@ import com.example.a95795.thegreenplant.custom.Machine;
 import com.example.a95795.thegreenplant.custom.MyApplication;
 import com.example.a95795.thegreenplant.custom.Phone;
 import com.example.a95795.thegreenplant.custom.SecretTextView;
+import com.example.a95795.thegreenplant.custom.User;
 import com.example.a95795.thegreenplant.custom.WorkShopJudge;
 import com.example.a95795.thegreenplant.custom.Workshop;
 import com.fadai.particlesmasher.ParticleSmasher;
@@ -54,6 +57,8 @@ import rm.com.longpresspopup.LongPressPopupBuilder;
 import rm.com.longpresspopup.PopupInflaterListener;
 import rm.com.longpresspopup.PopupStateListener;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -65,6 +70,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
     private int Id;
     private ListView listView_big,listView_small;
     private LinearLayout linearLayout;
+    private int ID,Workshop;
 
     public static EquipmentItemFragment newInstance() {
         return new EquipmentItemFragment();
@@ -77,46 +83,14 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
         View view = inflater.inflate(R.layout.fragment_equipment_item, container, false);
         expandableListView = (ExpandableListView) view.findViewById(R.id.expend_list);
         linearLayout = (LinearLayout) view.findViewById(R.id.equipmentAgain);
-
-
+        Context ctx = EquipmentItemFragment.this.getActivity();
+        SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+        ID = sp.getInt("STRING_KEY", 0);
+        Workshop = sp.getInt("STRING_KEY2",0);
+        list();
         EventBus.getDefault().register(this);
         adapter();
-        String url = getString(R.string.ip) + "user/environmental_unit";
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                "{\n" +
-                        "\t\"machineWorkshop\":"+workshop+"\n" +
-                        "}",
-                new Response.Listener< JSONObject>(){
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            Gson gson = new Gson();
-                            List<Machine> subjectList = gson.fromJson(response.getJSONArray("Machine").toString(),new TypeToken<List<Machine>>(){}.getType());
 
-                            EnvironmentAdapter adapter_big = new EnvironmentAdapter(EquipmentItemFragment.this.getActivity(), R.layout.listview,subjectList);
-                             listView_big = (ListView) getView().findViewById(R.id.listviewbig);
-                            listView_big.setAdapter(adapter_big);
-
-
-                            EnvironmentAdapter adapter_small = new EnvironmentAdapter(EquipmentItemFragment.this.getActivity(), R.layout.listview_small,subjectList);
-                             listView_small = (ListView) getView().findViewById(R.id.listview_little);
-                            listView_small.setAdapter(adapter_small);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener(){
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("volley",error.toString());
-                    }
-                }
-        );
-        MyApplication.addRequest(jsonObjectRequest,"MainActivity");
         return view;
     }
 
@@ -149,13 +123,15 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                             Gson gson = new Gson();
                             final ArrayList<Machine> subjectList = gson.fromJson(response.getJSONArray("Machine").toString(), new TypeToken<List<Machine>>() {
                             }.getType());
-                            expandableListView.setAdapter(new EquipmentAdapter(subjectList));
+                            expandableListView.setAdapter(new EquipmentAdapter(subjectList,Workshop));
                             //定义临时数组
                             final ArrayList list = new ArrayList();
+                            Log.d("2222222", "onResponse: "+list);
                             //遍历找到出现问题的设备
                             for (int i = 0; i < subjectList.size(); i++) {
-                                if (subjectList.get(i).getMachineFs().equals("1")) {
+                                if (subjectList.get(i).getMachineFs()==1) {
                                     list.add(subjectList.get(i).getMachineType() + subjectList.get(i).getMachineId() + "号");
+                                    Log.d("2222222", "onResponse: "+list);
                                 }
                             }
                             if (list.size() > 0) {
@@ -170,7 +146,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                             expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
                                 @Override
                                 public void onGroupExpand(int groupPosition) {
-                                    int count = new EquipmentAdapter(subjectList).getGroupCount();
+                                    int count = new EquipmentAdapter(subjectList,Workshop).getGroupCount();
                                     for (int i = 0; i < count; i++) {
                                         if (i != groupPosition) {
                                             expandableListView.collapseGroup(i);
@@ -188,7 +164,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                                     LongPressPopup popup = new LongPressPopupBuilder(EquipmentItemFragment.this.getActivity())
                                             .setTarget(v)
                                             .setPopupView(R.layout.particulars_abbreviate, EquipmentItemFragment.this)
-                                            .setLongPressDuration(2000)
+                                            .setLongPressDuration(200)
                                             .build();
                                     // You can also chain it to the .build() mehod call above without declaring the "popup" variable before
                                     popup.register();
@@ -205,12 +181,12 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                                         public void run() {
                                             expandableListView.setEnabled(true);
                                         }
-                                    }, 5000);    //延时3s执行
+                                    }, 3000);    //延时3s执行
                                     if (expandableListView.isGroupExpanded(groupPosition)) {
                                         ParticleSmasher smasher = new ParticleSmasher(EquipmentItemFragment.this.getActivity());
                                         smasher.reShowView(listView_big);
-                                        smasher.with(listView_small) .setStyle(SmashAnimator.STYLE_FLOAT_BOTTOM)
-                                                .setDuration(3000)
+                                        smasher.with(listView_small) .setStyle(SmashAnimator.STYLE_DROP)
+                                                .setDuration(1000)
                                                 .start();
                                         new Handler().postDelayed(new Runnable() {
                                             @Override
@@ -218,7 +194,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                                                 listView_big.setVisibility(View.VISIBLE);
                                                 listView_small.setVisibility(View.GONE );
                                             }
-                                        }, 3000);    //延时3s执行
+                                        }, 1000);    //延时3s执行
                                     } else {
 
                                         new Handler().postDelayed(new Runnable() {
@@ -226,8 +202,8 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                                             public void run() {
                                                 ParticleSmasher smasher = new ParticleSmasher(EquipmentItemFragment.this.getActivity());
                                                 smasher.reShowView(listView_small);
-                                                smasher.with(listView_big) .setStyle(SmashAnimator.STYLE_FLOAT_BOTTOM)
-                                                        .setDuration(3000)
+                                                smasher.with(listView_big) .setStyle(SmashAnimator.STYLE_DROP)
+                                                        .setDuration(1000)
                                                         .start();
                                                 new Handler().postDelayed(new Runnable() {
                                                     @Override
@@ -235,7 +211,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                                                         listView_big.setVisibility(View.GONE);
                                                         listView_small.setVisibility(View.VISIBLE );
                                                     }
-                                                }, 3000);    //延时3s执行
+                                                }, 1000);    //延时3s执行
                                             }
                                         }, 200);    //延时3s执行
 
@@ -389,5 +365,42 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                 }
         );
         MyApplication.addRequest(jsonObjectRequest, "MainActivity");
+    }
+
+    public void list(){
+        String url = getString(R.string.ip) + "user/environmental_unit";
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                "{\n" +
+                        "\t\"machineWorkshop\":"+workshop+"\n" +
+                        "}",
+                new Response.Listener< JSONObject>(){
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            Gson gson = new Gson();
+                            List<Machine> subjectList = gson.fromJson(response.getJSONArray("Machine").toString(),new TypeToken<List<Machine>>(){}.getType());
+
+                            EnvironmentAdapter adapter_big = new EnvironmentAdapter(EquipmentItemFragment.this.getActivity(), R.layout.listview,subjectList,Workshop);
+                            listView_big = (ListView) getView().findViewById(R.id.listviewbig);
+                            listView_big.setAdapter(adapter_big);
+                            EnvironmentAdapter adapter_small = new EnvironmentAdapter(EquipmentItemFragment.this.getActivity(), R.layout.listview_small,subjectList,Workshop);
+                            listView_small = (ListView) getView().findViewById(R.id.listview_little);
+                            listView_small.setAdapter(adapter_small);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener(){
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("volley",error.toString());
+                    }
+                }
+        );
+        MyApplication.addRequest(jsonObjectRequest,"MainActivity");
     }
 }

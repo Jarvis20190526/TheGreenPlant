@@ -1,5 +1,7 @@
 package com.example.a95795.thegreenplant.adapter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +37,7 @@ import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.mob.MobSDK.getContext;
 import static com.mob.tools.utils.Strings.getString;
 import static com.nightonke.jellytogglebutton.JellyTypes.Jelly.ACTIVE_TREMBLE_BODY_SLIM_JIM;
@@ -48,10 +51,13 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
     public String[] groupString = {"电机（PRO）"};
     public String[][] childString = new String[1][3];
     public List<Machine> list;
+    public int workid;
+    
 
     //重写构造方法
-    public EquipmentAdapter(List<Machine> objects) {
+    public EquipmentAdapter(List<Machine> objects,int work) {
         this.list = objects;
+        this.workid = work;
         for (int i = 0; i < 3; i++) {
             childString[0][i] = list.get(i).getMachineType()+list.get(i).getMachineId();
         }
@@ -241,6 +247,9 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
                     //隐藏警告按钮
                     imageView.setVisibility(View.INVISIBLE);
                     jellyToggleButton.setChecked(false, false);
+                    if(workid==0){
+                        jellyToggleButton.setEnabled(false);
+                    }
                 }
             } else if (list.get(child).getMachineSwitch()==1) {
                 //同上
@@ -248,6 +257,9 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
                     //隐藏警告按钮
                     imageView.setVisibility(View.INVISIBLE);
                     jellyToggleButton.setChecked(true, false);
+                    if(workid==0){
+                        jellyToggleButton.setEnabled(false);
+                    }
                 }
 
         }

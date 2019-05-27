@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layoutAnimation="@anim/list_layout_animation"
     tools:context="com.example.a95795.thegreenplant.register.MessageFragment">
 
     <android.support.design.widget.AppBarLayout

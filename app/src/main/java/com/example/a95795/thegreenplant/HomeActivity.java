@@ -1,7 +1,10 @@
 package com.example.a95795.thegreenplant;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.annotation.IdRes;
 import android.support.design.widget.CoordinatorLayout;
@@ -49,6 +52,7 @@ public class HomeActivity extends SupportActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         StatusBarCompat.compat(this, Color.parseColor("#FF16A295"));

@@ -66,6 +66,7 @@ public class PhoneFragment extends SupportFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view  = inflater.inflate(R.layout.fragment_phone, container, false);
+        Mac = getMac();
         init(view);   send();next();
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -89,7 +90,7 @@ public class PhoneFragment extends SupportFragment {
             }
         }, 1000);    //延时2s执行
 
-        Mac = getMac();
+
         return view;
     }
     //初始化
@@ -116,13 +117,13 @@ public class PhoneFragment extends SupportFragment {
     }
     public void mac(){
         phone = editText.getText().toString();
-        String url = getString(R.string.ip) + "user/UserFindPhone";
+        String url = getString(R.string.ip) + "user/FindUserMac";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
                 "{\n" +
                         "\t\"userCall\": \""+phone+"\",\n" +
-                        "\t \"userMac\": \""+getMac()+"\"\n" +
+                        "\t \"userMac\": \""+Mac+"\"\n" +
                         "\t\n" +
                         "}",
                 new Response.Listener<JSONObject>() {

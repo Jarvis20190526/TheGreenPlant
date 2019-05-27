@@ -29,16 +29,17 @@ import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static com.nightonke.jellytogglebutton.JellyTypes.Jelly.ACTIVE_TREMBLE_BODY_SLIM_JIM;
-
 public class EnvironmentAdapter extends ArrayAdapter<Machine> {
     public List<Machine> list;
-
+    public int workid;
     private int resourceId;
 
-    public EnvironmentAdapter(Context context, int textViewResourceId, List<Machine> objects) {
+    public EnvironmentAdapter(Context context, int textViewResourceId, List<Machine> objects,int work) {
         super(context, textViewResourceId, objects);
-        resourceId = textViewResourceId;
-        list = objects;
+        this.resourceId = textViewResourceId;
+        this.list = objects;
+        this.workid = work;
+
 
     }
 
@@ -81,6 +82,9 @@ public class EnvironmentAdapter extends ArrayAdapter<Machine> {
                 //隐藏警告按钮
                 imageView1.setVisibility(View.INVISIBLE);
                 jellyToggleButton.setChecked(false, false);
+                if(workid==0){
+                    jellyToggleButton.setEnabled(false);
+                }
             }
         } else if (list.get(position).getMachineSwitch() == 1) {
             //同上
@@ -88,6 +92,9 @@ public class EnvironmentAdapter extends ArrayAdapter<Machine> {
                 //隐藏警告按钮
                 imageView1.setVisibility(View.INVISIBLE);
                 jellyToggleButton.setChecked(true, false);
+                if(workid==0){
+                    jellyToggleButton.setEnabled(false);
+                }
             }
 
         }
