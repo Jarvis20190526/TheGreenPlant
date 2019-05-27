@@ -1,5 +1,6 @@
 package com.example.a95795.thegreenplant.HomeFragment;
 
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -25,8 +26,6 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;

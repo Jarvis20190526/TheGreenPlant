@@ -52,4 +52,14 @@
     <color name="fbutton_color_silver">#bdc3c7</color>
     <color name="fbutton_color_concrete">#95a5a6</color>
     <color name="fbutton_color_asbestos">#7f8c8d</color>
+
+    <color name="base_black_title_color">#222222</color>
+    <color name="arc1">#099bfb</color>
+    <color name="windows_bg">#f6f6f6</color>
+    <color name="content_bg">#eeeeee</color>
+    <color name="arc23">#079df9</color>
+    <color name="arc_text">#999999</color>
+    <color name="arc_temp">#333333</color>
+    <color name="transparent_gray">#90000000</color>
+
 </resources>
