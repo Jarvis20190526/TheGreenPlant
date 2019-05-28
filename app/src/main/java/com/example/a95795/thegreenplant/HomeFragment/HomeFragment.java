@@ -134,6 +134,7 @@ public class HomeFragment extends SupportFragment {
         fragmentList.add(null == information ? information = Information.newInstance() : information);
         viewPager.setAdapter(new MyPagerAdapter(getFragmentManager(), fragmentList));
 
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

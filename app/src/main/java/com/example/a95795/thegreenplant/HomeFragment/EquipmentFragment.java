@@ -37,6 +37,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.liaoinstan.springview.container.DefaultHeader;
 import com.liaoinstan.springview.widget.SpringView;
+import com.sbingo.guide.GuideView;
 
 import org.angmarch.views.NiceSpinner;
 import org.greenrobot.eventbus.EventBus;
@@ -64,7 +65,7 @@ public class EquipmentFragment extends SupportFragment {
         return new EquipmentFragment();
     }
     // SpringView
-    SpringView springView;
+   public SpringView springView;
 
 
     private Handler handler = new Handler(){
@@ -98,6 +99,7 @@ public class EquipmentFragment extends SupportFragment {
         niceSpinner.attachDataSource(spinnerData);
         niceSpinner.setTextSize(13);
         niceSpinner.setArrowDrawable(R.drawable.jiantou);
+
 
         niceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

@@ -146,15 +146,17 @@ public class Information extends SupportFragment {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
-                "",
+                "{\n" +
+                        "\t\"id\": "+ID+"\n" +
+                        "}",
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("volley", response.toString());
                         try {
-                            List<User> producttype = new Gson().fromJson(response.getString("UserList"), new TypeToken<List<User>>() {
-                            }.getType());
-                                    mNickName.setRightDesc(producttype.get(0).getUserName());
+                            Gson gson = new Gson();
+                            List<User> producttype = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
+                            mNickName.setRightDesc(producttype.get(0).getUserName());
                                     mTelephone.setRightDesc(producttype.get(0).getUserCall()+"");
                                     if(producttype.get(0).getUserWork()==0){
                                         mJob.setRightDesc("生产员");

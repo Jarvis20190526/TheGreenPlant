@@ -15,7 +15,7 @@ public class MyPagerAdapter extends FragmentPagerAdapter {
      * @param fm
      */
     private List<Fragment> fragments;
-
+//234
     public MyPagerAdapter(FragmentManager fm) {
         super(fm);
     }

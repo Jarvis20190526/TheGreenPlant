@@ -15,6 +15,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.a95795.thegreenplant.Login.LoginFragment;
 import com.example.a95795.thegreenplant.R;
 import com.example.a95795.thegreenplant.custom.Message;
 import com.example.a95795.thegreenplant.custom.Message_all;
@@ -152,7 +153,7 @@ public class EndMessageFragment extends SupportFragment {
                                                     public void run() {
                                                         popTo(PhoneFragment.class, true);
                                                     }
-                                                }, 2000);    //延时2s执行
+                                                }, 1000);    //延时1s执行
                                             }
                                         })
                                         .show();

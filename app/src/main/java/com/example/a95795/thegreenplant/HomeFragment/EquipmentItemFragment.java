@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +40,7 @@ import com.fadai.particlesmasher.ParticleSmasher;
 import com.fadai.particlesmasher.SmashAnimator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sbingo.guide.GuideView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -84,6 +87,11 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
         expandableListView = (ExpandableListView) view.findViewById(R.id.expend_list);
         linearLayout = (LinearLayout) view.findViewById(R.id.equipmentAgain);
         Context ctx = EquipmentItemFragment.this.getActivity();
+        final GuideView.Builder builder = new GuideView.Builder(EquipmentItemFragment.this.getActivity(), "1.0");
+        builder//方
+                .addHintView(expandableListView, "点击此处可以展开电机列表", GuideView.Direction.BOTTOM, GuideView.MyShape.RECTANGULAR)
+                .addHintView(listView_big, "长按此处可以查看相关信息", GuideView.Direction.BOTTOM, GuideView.MyShape.RECTANGULAR);
+        builder.show();
         SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
         ID = sp.getInt("STRING_KEY", 0);
         Workshop = sp.getInt("STRING_KEY2",0);
@@ -160,6 +168,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                                     EquipmentItemFragment.GetMachineId getMachineId = new EquipmentItemFragment.GetMachineId(subjectList.get(childPosition).getMachineId());
                                     getMachineId.setMachineId();
+
                                     //长按子控件弹出框框
                                     LongPressPopup popup = new LongPressPopupBuilder(EquipmentItemFragment.this.getActivity())
                                             .setTarget(v)
@@ -379,6 +388,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+
                             Gson gson = new Gson();
                             List<Machine> subjectList = gson.fromJson(response.getJSONArray("Machine").toString(),new TypeToken<List<Machine>>(){}.getType());
 
@@ -403,4 +413,5 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
         );
         MyApplication.addRequest(jsonObjectRequest,"MainActivity");
     }
+
 }

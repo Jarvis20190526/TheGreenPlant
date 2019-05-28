@@ -48,13 +48,14 @@ public class MainActivity extends SupportActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         web();
+        loadRootFragment(R.id.Home, LoginFragment.newInstance()); //activity初始加载LogonFragment
 
 
         //适配三大虚拟键 避免遮盖控件
         if (AndroidWorkaround.checkDeviceHasNavigationBar(this)) {
             AndroidWorkaround.assistActivity(findViewById(android.R.id.content));
         }
-        loadRootFragment(R.id.Home, LoginFragment.newInstance()); //activity初始加载LogonFragment
+
 
 
 
@@ -111,13 +112,8 @@ public class MainActivity extends SupportActivity  {
         MyApplication.addRequest(jsonObjectRequest, "MainActivity");
         SharedPreferences sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
         String name_str = sharedPreferences.getString("name", "");
-        Log.d("11111111", "web: "+name_str);
-        Log.d("111111111", "web: "+num);
         num = name_str;
-        Log.d("11111111", "web: "+name_str);
-        Log.d("111111111", "web: "+num);
         if(num.equals("1")){
-
         }else {
             new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
                     .setTitleText("提示")

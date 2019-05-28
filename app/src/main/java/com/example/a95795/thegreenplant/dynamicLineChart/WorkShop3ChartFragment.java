@@ -62,6 +62,7 @@ public class WorkShop3ChartFragment extends Fragment {
         colour.add(Color.BLUE);
         dynamicLineChartManager = new DynamicLineChartManager(chart, names, colour);
         dynamicLineChartManager.setYAxis(100, 0, 10);
+        chart.invalidate();
     }
     public void getData() {
         String url = "https://free-api.heweather.net/s6/weather//now?location="+city+"&key="+getString(R.string.key);
