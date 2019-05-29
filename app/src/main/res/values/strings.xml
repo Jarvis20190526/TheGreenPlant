@@ -2,14 +2,13 @@
     <string name="app_name">TheGreenPlant</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="ip">http://192.168.43.26:8080/</string>
+    <string name="ip">http://172.20.10.6:8080/</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_home">设备</string>
     <string name="title_dashboard">环境</string>
     <string name="title_notifications">个人</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close naviga
-        tion drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

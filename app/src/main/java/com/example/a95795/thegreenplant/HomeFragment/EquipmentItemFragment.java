@@ -87,11 +87,6 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
         expandableListView = (ExpandableListView) view.findViewById(R.id.expend_list);
         linearLayout = (LinearLayout) view.findViewById(R.id.equipmentAgain);
         Context ctx = EquipmentItemFragment.this.getActivity();
-        final GuideView.Builder builder = new GuideView.Builder(EquipmentItemFragment.this.getActivity(), "1.0");
-        builder//方
-                .addHintView(expandableListView, "点击此处可以展开电机列表", GuideView.Direction.BOTTOM, GuideView.MyShape.RECTANGULAR)
-                .addHintView(listView_big, "长按此处可以查看相关信息", GuideView.Direction.BOTTOM, GuideView.MyShape.RECTANGULAR);
-        builder.show();
         SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
         ID = sp.getInt("STRING_KEY", 0);
         Workshop = sp.getInt("STRING_KEY2",0);
@@ -169,11 +164,11 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                                     EquipmentItemFragment.GetMachineId getMachineId = new EquipmentItemFragment.GetMachineId(subjectList.get(childPosition).getMachineId());
                                     getMachineId.setMachineId();
 
-                                    //长按子控件弹出框框
+                                    //点击子控件弹出框框
                                     LongPressPopup popup = new LongPressPopupBuilder(EquipmentItemFragment.this.getActivity())
                                             .setTarget(v)
                                             .setPopupView(R.layout.particulars_abbreviate, EquipmentItemFragment.this)
-                                            .setLongPressDuration(200)
+                                            .setLongPressDuration(50)
                                             .build();
                                     // You can also chain it to the .build() mehod call above without declaring the "popup" variable before
                                     popup.register();
