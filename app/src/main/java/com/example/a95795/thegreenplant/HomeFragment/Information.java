@@ -5,12 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -30,29 +31,39 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import me.yokeyword.fragmentation.SupportFragment;
+import rm.com.longpresspopup.LongPressPopup;
+import rm.com.longpresspopup.LongPressPopupBuilder;
+import rm.com.longpresspopup.PopupInflaterListener;
+import rm.com.longpresspopup.PopupOnHoverListener;
+import rm.com.longpresspopup.PopupStateListener;
 import ru.katso.livebutton.LiveButton;
 
-import static android.content.Context.MODE_PRIVATE;
-
-public class Information extends SupportFragment {
+public class Information extends SupportFragment implements PopupInflaterListener,
+        PopupStateListener, PopupOnHoverListener, View.OnClickListener{
 
     private ImageView mHBack;
     private ImageView mHHead;
 
     private ItemView mNickName;
     private ItemView mSex;
-    private ItemView mId;
     private ItemView mTelephone;
-    private ItemView mTime;
     private ItemView mJob;
     private ItemView mWorkshop;
     private LiveButton exit;
+    private TextView info;
+    private TextView info2;
+    private TextView info3;
+    private TextView info4;
     private int ID;
+    String name,userid,id,time,num;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,8 +80,9 @@ public class Information extends SupportFragment {
         set();
         setData();
         initView();
+        pop();
         Context ctx = Information.this.getActivity();
-        SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
+        SharedPreferences sp = ctx.getSharedPreferences("SP", Context.MODE_PRIVATE);
         ID = sp.getInt("STRING_KEY", 0);
         exit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,32 +167,46 @@ public class Information extends SupportFragment {
                         Log.d("volley", response.toString());
                         try {
                             Gson gson = new Gson();
-                            List<User> producttype = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
-                            mNickName.setRightDesc(producttype.get(0).getUserName());
-                                    mTelephone.setRightDesc(producttype.get(0).getUserCall()+"");
-                                    if(producttype.get(0).getUserWork()==0){
+                            List<User> users = new Gson().fromJson(response.getString("UserList"), new TypeToken<List<User>>() {
+                            }.getType());
+
+                                    mNickName.setRightDesc(users.get(0).getUserName());
+                                    mTelephone.setRightDesc(users.get(0).getUserCall().replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+                                    if(users.get(0).getUserWork()==0){
                                         mJob.setRightDesc("生产员");
-                                        mWorkshop.setRightDesc("生产员无管理车间");
+                                        //mWorkshop.setRightDesc("生产员无管理车间");
+                                        mWorkshop.setLeftTitle("工作车间");
+                                        mWorkshop.setRightDesc(users.get(0).getUserWorkshop()+"号车间");
                                     }else{
                                         mJob.setRightDesc("管理员");
-                                        mWorkshop.setRightDesc(producttype.get(0).getUserWorkshop()+"");
+                                        mWorkshop.setRightDesc(users.get(0).getUserWorkshop()+"号车间");
                                     }
-                                    if (producttype.get(0).getUserSex()==0) {
+                                    if (users.get(0).getUserSex()==0) {
                                         mSex.setRightDesc("男");
-                                    }else{
-                                        mSex.setRightDesc("女");
-                                        Glide.with(getContext()).load(R.drawable.test)
+                                        Glide.with(getContext()).load(R.drawable.man)
                                                 .bitmapTransform(new BlurTransformation(getContext(), 25), new CenterCrop(getContext()))
                                                 .into(mHBack);
                                         //设置圆形图像
-                                        Glide.with(getContext()).load(R.drawable.test)
+                                        Glide.with(getContext()).load(R.drawable.man)
+                                                .bitmapTransform(new CropCircleTransformation(getContext()))
+                                                .into(mHHead);
+                                    }else{
+                                        mSex.setRightDesc("女");
+                                        Glide.with(getContext()).load(R.drawable.head)
+                                                .bitmapTransform(new BlurTransformation(getContext(), 25), new CenterCrop(getContext()))
+                                                .into(mHBack);
+                                        //设置圆形图像
+                                        Glide.with(getContext()).load(R.drawable.head)
                                                 .bitmapTransform(new CropCircleTransformation(getContext()))
                                                 .into(mHHead);
                                     }
-                                   /* Date date=producttype.get(i).getUserFirstjob();
+                                    name=users.get(0).getUserName();
+                                    userid=users.get(0).getUserId();
+                                    id=users.get(0).getId()+"";
+                                    num=users.get(0).getUserNum();
+                                    Date date=users.get(0).getUserFirstjob();
                                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                    mTime.setRightDesc(sdf.format(date));*/
-
+                                    time=sdf.format(date);
 
 
 //                           HocellAdapter myAdapter=new HocellAdapter(producttype,R.layout.hocell);
@@ -205,6 +231,123 @@ public class Information extends SupportFragment {
         MyApplication.addRequest(jsonObjectRequest, "MainActivity");
     }
 
+    public void pop(){
+        LongPressPopup popup = new LongPressPopupBuilder(getContext())
+                .setTarget(mNickName)
+                //.setPopupView(textView)// Not using this time
+                .setPopupView(R.layout.detail, this)
+                .setLongPressDuration(400)
+                .setDismissOnLongPressStop(false)
+                .setDismissOnTouchOutside(true)
+                .setDismissOnBackPressed(true)
+                .setCancelTouchOnDragOutsideView(true)
+                .setLongPressReleaseListener(this)
+                .setOnHoverListener(this)
+                .setPopupListener(this)
+                .setTag("PopupFoo")
+                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
+                .build();
+        popup.register();
 
 
+        LongPressPopup popup2 = new LongPressPopupBuilder(getContext())
+                .setTarget(mSex)
+                //.setPopupView(textView)// Not using this time
+                .setPopupView(R.layout.detail, this)
+                .setLongPressDuration(400)
+                .setDismissOnLongPressStop(false)
+                .setDismissOnTouchOutside(true)
+                .setDismissOnBackPressed(true)
+                .setCancelTouchOnDragOutsideView(true)
+                .setLongPressReleaseListener(this)
+                .setOnHoverListener(this)
+                .setPopupListener(this)
+                .setTag("PopupFoo")
+                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
+                .build();
+        popup2.register();
+
+        LongPressPopup popup3 = new LongPressPopupBuilder(getContext())
+                .setTarget(mTelephone)
+                //.setPopupView(textView)// Not using this time
+                .setPopupView(R.layout.detail, this)
+                .setLongPressDuration(400)
+                .setDismissOnLongPressStop(false)
+                .setDismissOnTouchOutside(true)
+                .setDismissOnBackPressed(true)
+                .setCancelTouchOnDragOutsideView(true)
+                .setLongPressReleaseListener(this)
+                .setOnHoverListener(this)
+                .setPopupListener(this)
+                .setTag("PopupFoo")
+                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
+                .build();
+        popup3.register();
+
+        LongPressPopup popup4 = new LongPressPopupBuilder(getContext())
+                .setTarget(mJob)
+                //.setPopupView(textView)// Not using this time
+                .setPopupView(R.layout.detail, this)
+                .setLongPressDuration(400)
+                .setDismissOnLongPressStop(false)
+                .setDismissOnTouchOutside(true)
+                .setDismissOnBackPressed(true)
+                .setCancelTouchOnDragOutsideView(true)
+                .setLongPressReleaseListener(this)
+                .setOnHoverListener(this)
+                .setPopupListener(this)
+                .setTag("PopupFoo")
+                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
+                .build();
+        popup4.register();
+
+        LongPressPopup popup5 = new LongPressPopupBuilder(getContext())
+                .setTarget(mWorkshop)
+                //.setPopupView(textView)// Not using this time
+                .setPopupView(R.layout.detail, this)
+                .setLongPressDuration(400)
+                .setDismissOnLongPressStop(false)
+                .setDismissOnTouchOutside(true)
+                .setDismissOnBackPressed(true)
+                .setCancelTouchOnDragOutsideView(true)
+                .setLongPressReleaseListener(this)
+                .setOnHoverListener(this)
+                .setPopupListener(this)
+                .setTag("PopupFoo")
+                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
+                .build();
+        popup5.register();
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void onViewInflated(@Nullable String popupTag, View root) {
+        info=root.findViewById(R.id.info);
+        info2=root.findViewById(R.id.info2);
+        info3=root.findViewById(R.id.info3);
+        info4=root.findViewById(R.id.info4);
+        info.setText(name);
+        info2.setText(userid);
+        info3.setText(id);
+        info4.setText(time);
+    }
+
+    @Override
+    public void onHoverChanged(View view, boolean isHovered) {
+
+    }
+
+    @Override
+    public void onPopupShow(@Nullable String popupTag) {
+
+    }
+
+    @Override
+    public void onPopupDismiss(@Nullable String popupTag) {
+
+    }
 }

@@ -2,14 +2,10 @@ package com.example.a95795.thegreenplant.custom;
 
 import java.util.Date;
 
-/**
- * Created by 95795 on 2019-04-17.
- */
-
 public class User {
     private Integer id;
 
-    private Integer userId;
+    private String userId;
 
     private String userName;
 
@@ -27,7 +23,9 @@ public class User {
 
     private String userNum;
 
-    private String userNumberId;
+    private String userIdentity;
+
+    private String userMac;
 
     public Integer getId() {
         return id;
@@ -37,12 +35,12 @@ public class User {
         this.id = id;
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUserId(String userId) {
+        this.userId = userId == null ? null : userId.trim();
     }
 
     public String getUserName() {
@@ -109,11 +107,19 @@ public class User {
         this.userNum = userNum == null ? null : userNum.trim();
     }
 
-    public String getUserNumberId() {
-        return userNumberId;
+    public String getUserIdentity() {
+        return userIdentity;
     }
 
-    public void setUserNumberId(String userNumberId) {
-        this.userNumberId = userNumberId == null ? null : userNumberId.trim();
+    public void setUserIdentity(String userIdentity) {
+        this.userIdentity = userIdentity == null ? null : userIdentity.trim();
+    }
+
+    public String getUserMac() {
+        return userMac;
+    }
+
+    public void setUserMac(String userMac) {
+        this.userMac = userMac == null ? null : userMac.trim();
     }
 }
