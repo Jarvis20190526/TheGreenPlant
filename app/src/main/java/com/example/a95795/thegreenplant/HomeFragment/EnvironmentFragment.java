@@ -95,7 +95,6 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
             fragments.add(new DayTableFragment());//日表  3
             fragments.add(new WeekTableFragment());//周表  4
             fragments.add(new MonTableFragment());//月表  5
-            fragments.add(new MonTableFragment());//月表  5
             showFragment();
         }
         return view;

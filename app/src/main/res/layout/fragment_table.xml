@@ -21,6 +21,7 @@
        android:layout_marginEnd="8dp"
        android:layout_marginStart="8dp"
        android:background="@drawable/dialog_btn_bg"
+       android:layout_marginBottom="60dp"
        android:clickable="true"
        android:text="表格配置"
        android:textColor="#fff"
