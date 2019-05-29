@@ -20,7 +20,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.eminayar.panter.DialogType;
 import com.eminayar.panter.PanterDialog;
+import com.eminayar.panter.interfaces.OnTextInputConfirmListener;
 import com.example.a95795.thegreenplant.MainActivity;
 import com.example.a95795.thegreenplant.R;
 import com.example.a95795.thegreenplant.custom.MyApplication;
@@ -34,6 +36,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
@@ -151,6 +155,39 @@ public class Information extends SupportFragment implements PopupInflaterListene
         });
 */
 
+      mTelephone.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              new PanterDialog(getContext())
+                      .setHeaderBackground(R.drawable.pattern_bg_orange)
+                      .setDialogType(DialogType.INPUT)
+                      .isCancelable(true)
+                      .input("请输入新的手机号",
+                              "请不要输入空的手机号", new
+                                      OnTextInputConfirmListener() {
+                                          @Override
+                                          public void onTextInputConfirmed(String text) {
+                                              Pattern pattern = Pattern.compile("[0-9]*");
+                                              String regex = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$";
+                                              Matcher isNum = pattern.matcher(text);
+                                              if (!isNum.matches()) {
+                                                  Toast.makeText(getActivity(),"您输入的并非纯数字",Toast.LENGTH_LONG).show();
+                                              }else if(isNum.matches()&&text.length()!=11){
+                                                  Toast.makeText(getActivity(),"您输入的手机号长度不符合",Toast.LENGTH_LONG).show();
+                                              }else if (isNum.matches()&&text.length()==11&& !Pattern.matches(regex, text)){
+                                                  Toast.makeText(getActivity(),"您输入的手机号不符合格式",Toast.LENGTH_LONG).show();
+                                              }else{
+                                                  mTelephone.setRightDesc(text.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+
+
+                                              }
+
+                                          }
+                                      }).show();
+          }
+      });
+
+
     }
 
     private void initView() {
@@ -250,73 +287,7 @@ public class Information extends SupportFragment implements PopupInflaterListene
         popup.register();
 
 
-        LongPressPopup popup2 = new LongPressPopupBuilder(getContext())
-                .setTarget(mSex)
-                //.setPopupView(textView)// Not using this time
-                .setPopupView(R.layout.detail, this)
-                .setLongPressDuration(400)
-                .setDismissOnLongPressStop(false)
-                .setDismissOnTouchOutside(true)
-                .setDismissOnBackPressed(true)
-                .setCancelTouchOnDragOutsideView(true)
-                .setLongPressReleaseListener(this)
-                .setOnHoverListener(this)
-                .setPopupListener(this)
-                .setTag("PopupFoo")
-                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
-                .build();
-        popup2.register();
 
-        LongPressPopup popup3 = new LongPressPopupBuilder(getContext())
-                .setTarget(mTelephone)
-                //.setPopupView(textView)// Not using this time
-                .setPopupView(R.layout.detail, this)
-                .setLongPressDuration(400)
-                .setDismissOnLongPressStop(false)
-                .setDismissOnTouchOutside(true)
-                .setDismissOnBackPressed(true)
-                .setCancelTouchOnDragOutsideView(true)
-                .setLongPressReleaseListener(this)
-                .setOnHoverListener(this)
-                .setPopupListener(this)
-                .setTag("PopupFoo")
-                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
-                .build();
-        popup3.register();
-
-        LongPressPopup popup4 = new LongPressPopupBuilder(getContext())
-                .setTarget(mJob)
-                //.setPopupView(textView)// Not using this time
-                .setPopupView(R.layout.detail, this)
-                .setLongPressDuration(400)
-                .setDismissOnLongPressStop(false)
-                .setDismissOnTouchOutside(true)
-                .setDismissOnBackPressed(true)
-                .setCancelTouchOnDragOutsideView(true)
-                .setLongPressReleaseListener(this)
-                .setOnHoverListener(this)
-                .setPopupListener(this)
-                .setTag("PopupFoo")
-                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
-                .build();
-        popup4.register();
-
-        LongPressPopup popup5 = new LongPressPopupBuilder(getContext())
-                .setTarget(mWorkshop)
-                //.setPopupView(textView)// Not using this time
-                .setPopupView(R.layout.detail, this)
-                .setLongPressDuration(400)
-                .setDismissOnLongPressStop(false)
-                .setDismissOnTouchOutside(true)
-                .setDismissOnBackPressed(true)
-                .setCancelTouchOnDragOutsideView(true)
-                .setLongPressReleaseListener(this)
-                .setOnHoverListener(this)
-                .setPopupListener(this)
-                .setTag("PopupFoo")
-                .setAnimationType(LongPressPopup.ANIMATION_TYPE_FROM_CENTER)
-                .build();
-        popup5.register();
     }
 
     @Override

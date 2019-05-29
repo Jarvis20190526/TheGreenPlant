@@ -83,9 +83,10 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:text="你可以长按上方列表任意项，获取更多用户信息"
+            android:layout_height="wrap_content"
+            android:text="你可以长按上方列表用户名项，获取更多用户信息。点击手机号项可更换号码"
             android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"/>
 
         <ru.katso.livebutton.LiveButton
