@@ -158,7 +158,6 @@ public class EquipmentFragment extends SupportFragment {
                         try {
                             Gson gson = new Gson();
                             List<User> subjectList = gson.fromJson(response.getJSONArray("UserList").toString(),new TypeToken<List<User>>(){}.getType());
-
                             if (subjectList.get(0).getUserWork()==0){
                                 niceSpinner.setClickable(false);
 

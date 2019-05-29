@@ -20,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ public class HomeActivity extends SupportActivity
 
         implements NavigationView.OnNavigationItemSelectedListener {
     SecretTextView secretTextView;
+    ImageView imageView;
 
     public static HomeActivity newInstance() {
         return new HomeActivity();
@@ -53,6 +56,7 @@ public class HomeActivity extends SupportActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        imageView = findViewById(R.id.imageView3);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         StatusBarCompat.compat(this, Color.parseColor("#FF16A295"));
@@ -68,6 +72,13 @@ public class HomeActivity extends SupportActivity
         secretTextView = (SecretTextView)findViewById(R.id.textView);
         secretTextView.setDuration(1000);
         secretTextView.setIsVisible(true);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, RealActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
 
@@ -125,17 +136,21 @@ public class HomeActivity extends SupportActivity
     public void test(int number) {
         switch (number) {
             case 1:
+                imageView.setVisibility(View.VISIBLE);
                 secretTextView.hide();
                 secretTextView.setText("环境监测");
                 secretTextView.show();
+
                 break;
             case 2:
+                imageView.setVisibility(View.GONE);
                 secretTextView.hide();
                 secretTextView.setText("设备监测");
                 secretTextView.show();
 
                 break;
             case 3:
+                imageView.setVisibility(View.GONE);
                 secretTextView.hide();
                 secretTextView.setText("个人中心");
                 secretTextView.show();
