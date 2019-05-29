@@ -129,4 +129,16 @@ dependencies {
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     implementation 'com.github.ViksaaSkool:AwesomeSplash:v1.0.0'
     implementation 'com.github.medyo:android-about-page:1.2.5'
+
+    //Retrofit的依赖包
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    //自动将服务器返回的json数据转换成实体类；我们传给retrofit的实体类，自动转换成json
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+
+    //RxJava 依赖包
+    implementation'io.reactivex.rxjava2:rxjava:2.2.7'
+    //RxJavaAndroid依赖包
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    //rxjava+retrofit 用到的一个依赖包，使得接口调用数据，以Rxjava形式提供给我们
+    implementation'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
 }

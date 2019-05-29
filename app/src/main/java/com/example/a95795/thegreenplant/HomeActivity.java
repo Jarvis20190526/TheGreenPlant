@@ -136,16 +136,17 @@ public class HomeActivity extends SupportActivity
     public void test(int number) {
         switch (number) {
             case 1:
-                imageView.setVisibility(View.VISIBLE);
+                imageView.setVisibility(View.GONE);
                 secretTextView.hide();
-                secretTextView.setText("环境监测");
+                secretTextView.setText("设备监测");
                 secretTextView.show();
 
                 break;
             case 2:
-                imageView.setVisibility(View.GONE);
+
+                imageView.setVisibility(View.VISIBLE);
                 secretTextView.hide();
-                secretTextView.setText("设备监测");
+                secretTextView.setText("环境监测");
                 secretTextView.show();
 
                 break;

@@ -1,7 +1,10 @@
 package com.example.a95795.thegreenplant.dynamicLineChart;
 
+import android.util.Log;
 
-
+import com.example.a95795.thegreenplant.bean.EnvironmentInfoWeek;
+import com.example.a95795.thegreenplant.tools.OpenApiManager;
+import com.example.a95795.thegreenplant.tools.OpenApiService;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -19,7 +22,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DynamicLineChartManager {
+
+import retrofit2.Call;
+import retrofit2.Callback;
+
+public class WeekDynamicLineChartManager {
     private LineChart lineChart;
     private YAxis leftAxis;
     private YAxis rightAxis;
@@ -29,9 +36,60 @@ public class DynamicLineChartManager {
     private List<ILineDataSet> lineDataSets = new ArrayList<>();
     private SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//设置日期格式  
     private List<String> timeList = new ArrayList<>(); //存储x轴的时间
+    private String time;
+    private String TAG = "volley";
+    private OpenApiService openApiService = OpenApiManager.createOpenApiService();
+    private int TYPE = 1;
+    Call<EnvironmentInfoWeek> einfo;
+
+    public void getEnvironmentInfoList() {
+        switch (TYPE){
+            case 0:
+                einfo = openApiService.queryEnvironmentInfoWeek();
+                break;
+            case 1:
+                einfo = openApiService.queryEnvironmentInfoWeekByType1();
+                break;
+            case 2:
+                einfo = openApiService.queryEnvironmentInfoWeekByType2();
+                break;
+            case 3:
+                einfo = openApiService.queryEnvironmentInfoWeekByType3();
+                break;
+            case 4:
+                einfo = openApiService.queryEnvironmentInfoWeekByType4();
+                break;
+        }
+        //step4:通过异步获取数据
+        einfo.enqueue(new Callback<EnvironmentInfoWeek>() {
+            @Override
+            public void onResponse(Call<EnvironmentInfoWeek> call, retrofit2.Response<EnvironmentInfoWeek> response) {
+                Log.e(TAG, "onResponse: 请求成功！！！" );
+                EnvironmentInfoWeek ef=response.body();
+
+                for(int j=0;j<ef.getEnvironmentInfoList().size();j++){
+                    time = ef.getEnvironmentInfoList().get(j).getWeekTime();
+                    timeList.add(time);
+                    xAxis.setValueFormatter(new IAxisValueFormatter() {
+                        @Override
+                        public String getFormattedValue(float value, AxisBase axis) {
+                            return timeList.get((int) value % timeList.size());
+                        }
+                    });
+                }
+
+            }
+            @Override
+            public void onFailure(Call<EnvironmentInfoWeek> call, Throwable t) {
+                Log.e(TAG, "onFailure: 请求失败！！！！~~~~~" );
+                Log.e(TAG, "onFailure: "+t.getMessage() );
+            }
+        });
+    }
+
 
     //一条曲线
-    public DynamicLineChartManager(LineChart mLineChart, String name, int color) {
+    public WeekDynamicLineChartManager(LineChart mLineChart, String name, int color) {
         this.lineChart = mLineChart;
         leftAxis = lineChart.getAxisLeft();
         rightAxis = lineChart.getAxisRight();
@@ -41,7 +99,7 @@ public class DynamicLineChartManager {
     }
 
     //多条曲线,区别List<String> names, List<Integer> colors
-    public DynamicLineChartManager(LineChart mLineChart, List<String> names, List<Integer> colors) {
+    public WeekDynamicLineChartManager(LineChart mLineChart, List<String> names, List<Integer> colors) {
         this.lineChart = mLineChart;
         leftAxis = lineChart.getAxisLeft();
         rightAxis = lineChart.getAxisRight();
@@ -61,7 +119,7 @@ public class DynamicLineChartManager {
         //折线图例 标签 设置
         Legend legend = lineChart.getLegend();
         legend.setForm(Legend.LegendForm.LINE);
-        legend.setTextSize(11f);
+        legend.setTextSize(10f);
         //显示位置
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
@@ -73,12 +131,12 @@ public class DynamicLineChartManager {
         xAxis.setGranularity(1f);//间隔尺寸
         xAxis.setLabelCount(10);
         //时间格式化
-        xAxis.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return timeList.get((int) value % timeList.size());
-            }
-        });
+//        xAxis.setValueFormatter(new IAxisValueFormatter() {
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return timeList.get((int) value % timeList.size());
+//            }
+//        });
 
         //保证Y轴从0开始，不然会上移一点
         leftAxis.setAxisMinimum(0f);
@@ -108,7 +166,6 @@ public class DynamicLineChartManager {
         lineData = new LineData();
         lineChart.setData(lineData);
         lineChart.invalidate();
-
     }
 
     /**
@@ -138,10 +195,7 @@ public class DynamicLineChartManager {
         lineData = new LineData();
         lineChart.setData(lineData);
         lineChart.invalidate();
-
-
     }
-
 
     /**
      * 动态添加数据（一条折线图）
@@ -156,12 +210,6 @@ public class DynamicLineChartManager {
         }
         lineChart.setData(lineData);
 
-        //避免集合数据过多，及时清空（做这样的处理，并不知道有没有用，但还是这样做了）
-        if (timeList.size() > 11) {
-            timeList.clear();
-        }
-        timeList.add(df.format(System.currentTimeMillis()));//获取现在的时间
-
 
         Entry entry = new Entry(lineDataSet.getEntryCount(), number);
         lineData.addEntry(entry, 0);
@@ -169,7 +217,7 @@ public class DynamicLineChartManager {
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
         //设置在曲线图中显示的最大数量
-        lineChart.setVisibleXRangeMaximum(6);
+        lineChart.setVisibleXRangeMaximum(3);
         //移到某个位置:点击按钮时曲线移动的位置
         lineChart.moveViewToX(lineData.getEntryCount() - 5);
     }
@@ -180,25 +228,94 @@ public class DynamicLineChartManager {
      * @param numbers
      */
     public void addEntry(List<Integer> numbers) {
-
+        TYPE = 0;
         if (lineDataSets.get(0).getEntryCount() == 0) {
             lineData = new LineData(lineDataSets);
             lineChart.setData(lineData);
         }
-        if (timeList.size() > 11) {
-            timeList.clear();
-        }
-        timeList.add(df.format(System.currentTimeMillis()));
+        getEnvironmentInfoList();
+
         for (int i = 0; i < numbers.size(); i++) {
             Entry entry = new Entry(lineDataSet.getEntryCount(), numbers.get(i));
             lineData.addEntry(entry, i);
             lineData.notifyDataChanged();
             lineChart.notifyDataSetChanged();
-            lineChart.setVisibleXRangeMaximum(6);
+            lineChart.setVisibleXRangeMaximum(3);
             lineChart.moveViewToX(lineData.getEntryCount() - 5);
         }
     }
 
+    public void addEntry1(List<Integer> numbers) {
+        TYPE = 1;
+        if (lineDataSets.get(0).getEntryCount() == 0) {
+            lineData = new LineData(lineDataSets);
+            lineChart.setData(lineData);
+        }
+        getEnvironmentInfoList();
+
+        for (int i = 0; i < numbers.size(); i++) {
+            Entry entry = new Entry(lineDataSet.getEntryCount(), numbers.get(i));
+            lineData.addEntry(entry, i);
+            lineData.notifyDataChanged();
+            lineChart.notifyDataSetChanged();
+            lineChart.setVisibleXRangeMaximum(5);
+            lineChart.moveViewToX(lineData.getEntryCount() - 5);
+        }
+    }
+
+    public void addEntry2(List<Integer> numbers) {
+        TYPE = 2;
+        if (lineDataSets.get(0).getEntryCount() == 0) {
+            lineData = new LineData(lineDataSets);
+            lineChart.setData(lineData);
+        }
+        getEnvironmentInfoList();
+
+        for (int i = 0; i < numbers.size(); i++) {
+            Entry entry = new Entry(lineDataSet.getEntryCount(), numbers.get(i));
+            lineData.addEntry(entry, i);
+            lineData.notifyDataChanged();
+            lineChart.notifyDataSetChanged();
+            lineChart.setVisibleXRangeMaximum(5);
+            lineChart.moveViewToX(lineData.getEntryCount() - 5);
+        }
+    }
+
+    public void addEntry3(List<Integer> numbers) {
+        TYPE = 3;
+        if (lineDataSets.get(0).getEntryCount() == 0) {
+            lineData = new LineData(lineDataSets);
+            lineChart.setData(lineData);
+        }
+        getEnvironmentInfoList();
+
+        for (int i = 0; i < numbers.size(); i++) {
+            Entry entry = new Entry(lineDataSet.getEntryCount(), numbers.get(i));
+            lineData.addEntry(entry, i);
+            lineData.notifyDataChanged();
+            lineChart.notifyDataSetChanged();
+            lineChart.setVisibleXRangeMaximum(5);
+            lineChart.moveViewToX(lineData.getEntryCount() - 5);
+        }
+    }
+
+    public void addEntry4(List<Integer> numbers) {
+        TYPE = 4;
+        if (lineDataSets.get(0).getEntryCount() == 0) {
+            lineData = new LineData(lineDataSets);
+            lineChart.setData(lineData);
+        }
+        getEnvironmentInfoList();
+
+        for (int i = 0; i < numbers.size(); i++) {
+            Entry entry = new Entry(lineDataSet.getEntryCount(), numbers.get(i));
+            lineData.addEntry(entry, i);
+            lineData.notifyDataChanged();
+            lineChart.notifyDataSetChanged();
+            lineChart.setVisibleXRangeMaximum(5);
+            lineChart.moveViewToX(lineData.getEntryCount() - 5);
+        }
+    }
     /**
      * 设置Y轴值
      *

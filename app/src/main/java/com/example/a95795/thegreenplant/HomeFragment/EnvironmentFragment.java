@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -23,10 +22,13 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.a95795.thegreenplant.HomeActivity;
 import com.example.a95795.thegreenplant.R;
-import com.example.a95795.thegreenplant.dynamicLineChart.DynamicLineChartFrament;
-import com.example.a95795.thegreenplant.table.ParseModeFragment;
+import com.example.a95795.thegreenplant.dynamicLineChart.DayDynamicLineChartFrament;
+import com.example.a95795.thegreenplant.dynamicLineChart.MonDynamicLineChartFrament;
+import com.example.a95795.thegreenplant.dynamicLineChart.WeekDynamicLineChartFrament;
+import com.example.a95795.thegreenplant.table.DayTableFragment;
+import com.example.a95795.thegreenplant.table.MonTableFragment;
+import com.example.a95795.thegreenplant.table.WeekTableFragment;
 import com.liaoinstan.springview.container.DefaultHeader;
 import com.liaoinstan.springview.widget.SpringView;
 
@@ -63,34 +65,39 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
     private List<Fragment> fragments = new ArrayList<>();
     private int currentIndex = 0;
     private View view;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_environment, container, false);
         initView();
-        initData();
         initEvnet();
-
         fragmentManager = getFragmentManager();
         if (savedInstanceState != null) { // “内存重启”时调用
-
             //获取“内存重启”时保存的索引下标
             currentIndex = savedInstanceState.getInt(CURRENT_FRAGMENT,0);
 
             fragments.removeAll(fragments);
             fragments.add(fragmentManager.findFragmentByTag(0+""));
             fragments.add(fragmentManager.findFragmentByTag(1+""));
+            fragments.add(fragmentManager.findFragmentByTag(2+""));
+            fragments.add(fragmentManager.findFragmentByTag(3+""));
+            fragments.add(fragmentManager.findFragmentByTag(4+""));
+            fragments.add(fragmentManager.findFragmentByTag(5+""));
+
             //恢复fragment页面
             restoreFragment();
-
-
         }else{      //正常启动时调用
-            fragments.add(new DynamicLineChartFrament());
-            fragments.add(new ParseModeFragment());
+            fragments.add(new DayDynamicLineChartFrament());//日图  0
+            fragments.add(new WeekDynamicLineChartFrament());//周图  1
+            fragments.add(new MonDynamicLineChartFrament());//月图  2
+            fragments.add(new DayTableFragment());//日表  3
+            fragments.add(new WeekTableFragment());//周表  4
+            fragments.add(new MonTableFragment());//月表  5
+            fragments.add(new MonTableFragment());//月表  5
             showFragment();
         }
-
-
         return view;
     }
 
@@ -121,18 +128,14 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
         ll_chart_table.setOnClickListener(this);
         tv_ct = view.findViewById(R.id.tv_ct);
         imageView_ct = view.findViewById(R.id.img_ct);
-
-        springView = (SpringView) view.findViewById(R.id.Spview_spbranchList);
         mSelectTv = (TextView) view.findViewById(R.id.tv_cycle);
         mSelectTv.setOnClickListener(this);
 
-    }
-
-    private void initData() {
-
+        springView = (SpringView) view.findViewById(R.id.Spview_spbranchList);
         springView.setHeader(new DefaultHeader(this.getActivity()));
 
     }
+
 
     private void initEvnet() {
 
@@ -152,7 +155,6 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
 
             }
         });
-
     }
 
     @Override
@@ -167,13 +169,12 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
                 }
                 break;
             case R.id.ll_chart_table:
-                if(i==1){
+                if(i==1){//在表格中
                     imageView_ct.setImageResource(R.drawable.tb);
                     tv_ct.setText("图表");
                     i=2;
-                    currentIndex = 1;
-                }else if(i==2){
-
+                    currentIndex = 3;
+                }else if(i==2){//在图表中
                     imageView_ct.setImageResource(R.drawable.line_chat);
                     tv_ct.setText("表格");
                     i=1;
@@ -183,6 +184,7 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
         }
         showFragment();
     }
+
     /**
      * 初始化popup窗口
      */
@@ -197,6 +199,31 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
         mTypeLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                currentIndex = position;
+                switch (position){
+                    case 0:
+                        if(i==2) {
+                            currentIndex = 3;
+                        }else if(i==1){
+                            currentIndex = 0;
+                        }
+                        break;
+                    case 1:
+                        if(i==2) {
+                            currentIndex = 4;
+                        }else if(i==1){
+                            currentIndex = 1;
+                        }
+                        break;
+                    case 2:
+                        if(i==2) {
+                            currentIndex = 5;
+                        }else if(i==1){
+                            currentIndex = 2;
+                        }
+                        break;
+                }
+                showFragment();
                 // 在这里获取item数据
                 String value = testData.get(position);
                 // 把选择的数据展示对应的TextView上
@@ -283,4 +310,6 @@ public class EnvironmentFragment extends SupportFragment implements View.OnClick
         currentFragment = fragments.get(currentIndex);
 
     }
+
+
 }

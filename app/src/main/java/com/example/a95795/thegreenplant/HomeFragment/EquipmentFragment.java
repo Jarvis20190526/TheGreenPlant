@@ -88,9 +88,14 @@ public class EquipmentFragment extends SupportFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
        View view = inflater.inflate(R.layout.fragment_equipment, container, false);
+
+
         Context ctx = EquipmentFragment.this.getActivity();
         SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
-        ID = sp.getInt("STRING_KEY", 0);
+        ID = sp.getInt("STRING_KEY", 0);//获取用户id
+        int work = sp.getInt("STRING_KEY2", 0);//获取用户是否为管理
+
+
         judge();judge2();
         springView = (SpringView) view.findViewById(R.id.Spview_spbranchList);
         niceSpinner =  view.findViewById(R.id.nice_spinner);

@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DynamicLineChartFrament extends Fragment implements View.OnClickListener{
+public class MonDynamicLineChartFrament extends Fragment implements View.OnClickListener{
     private LinearLayout ll_wshop1,ll_wshop2,ll_wshop3,ll_wshop4;
     private View view_wshop1,view_wshop2,view_wshop3,view_wshop4;
     private View view;
 
-    private static final String CURRENT_FRAGMENT = "STATE_FRAGMENT_SHOW";
+    private static final String CURRENT_FRAGMENT = "STATE_FRAGMENT_SHOW_WEEK";
     private FragmentManager fragmentManager;
     private Fragment currentFragment = new Fragment();
     private List<Fragment> fragments = new ArrayList<>();
@@ -32,12 +32,10 @@ public class DynamicLineChartFrament extends Fragment implements View.OnClickLis
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_dynamic_linechart, container, false);
+        view = inflater.inflate(R.layout.fragment_dynamic_linechart_mon, container, false);
         initView();
-
         fragmentManager = getFragmentManager();
         if (savedInstanceState != null) { // “内存重启”时调用
-
             //获取“内存重启”时保存的索引下标
             currentIndex = savedInstanceState.getInt(CURRENT_FRAGMENT,0);
 
@@ -49,17 +47,13 @@ public class DynamicLineChartFrament extends Fragment implements View.OnClickLis
 
             //恢复fragment页面
             restoreFragment();
-
-
         }else{      //正常启动时调用
-
-            fragments.add(new WorkShop1ChartFragment());
-            fragments.add(new WorkShop2ChartFragment());
-            fragments.add(new WorkShop3ChartFragment());
-            fragments.add(new WorkShop4ChartFragment());
+            fragments.add(new MonWorkShop1ChartFragment());
+            fragments.add(new MonWorkShop2ChartFragment());
+            fragments.add(new MonWorkShop3ChartFragment());
+            fragments.add(new MonWorkShop4ChartFragment());
             showFragment();
         }
-
         return view;
     }
 
@@ -101,7 +95,7 @@ public class DynamicLineChartFrament extends Fragment implements View.OnClickLis
         if(!fragments.get(currentIndex).isAdded()){
             transaction
                     .hide(currentFragment)
-                    .add(R.id.fra_chart_workshop,fragments.get(currentIndex),""+currentIndex);  //第三个参数为添加当前的fragment时绑定一个tag
+                    .add(R.id.fra_chart_workshop_mon,fragments.get(currentIndex),""+currentIndex);  //第三个参数为添加当前的fragment时绑定一个tag
 
         }else{
             transaction
@@ -136,20 +130,6 @@ public class DynamicLineChartFrament extends Fragment implements View.OnClickLis
         currentFragment = fragments.get(currentIndex);
 
     }
-
-//    //    切换碎片的方法
-//    private void replaceFragment(Fragment fragment){
-//        //1.实例化FragmentManager(碎片管理)对象
-//        FragmentManager fragmentManager = getFragmentManager();
-//        //2.实例化FragmentTransaction（碎片事务）对象，并开始事务
-//        FragmentTransaction fragmentTransaction =  fragmentManager.beginTransaction();
-//        //3.设置事务的动作（切换碎片布局）
-//        fragmentTransaction.replace(R.id.fra_chart_workshop,fragment);
-//        //4.将一个事务添加到返回栈中,实现按返回键能够返回上一个碎片的方法
-//        fragmentTransaction.addToBackStack(null);
-//        //5.提交事务
-//        fragmentTransaction.commit();
-//    }
 
     @Override
     public void onClick(View v) {

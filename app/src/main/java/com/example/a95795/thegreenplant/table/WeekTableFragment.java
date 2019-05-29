@@ -18,10 +18,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.daivd.chart.component.axis.BaseAxis;
 import com.daivd.chart.component.base.IAxis;
 import com.daivd.chart.core.LineChart;
@@ -33,12 +29,9 @@ import com.daivd.chart.provider.component.level.LevelLine;
 import com.daivd.chart.provider.component.mark.BubbleMarkView;
 import com.daivd.chart.provider.component.point.Point;
 import com.example.a95795.thegreenplant.R;
-import com.example.a95795.thegreenplant.tools.MyApplication;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.a95795.thegreenplant.bean.EnvironmentInfoWeek;
+import com.example.a95795.thegreenplant.tools.OpenApiManager;
+import com.example.a95795.thegreenplant.tools.OpenApiService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
 
 import comc.example.administrator.form.component.IComponent;
 import comc.example.administrator.form.core.SmartTable;
@@ -66,44 +59,43 @@ import comc.example.administrator.form.data.style.FontStyle;
 import comc.example.administrator.form.data.table.TableData;
 import comc.example.administrator.form.listener.OnColumnClickListener;
 import comc.example.administrator.form.utils.DensityUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
-public class ParseModeFragment extends Fragment implements View.OnClickListener{
+public class WeekTableFragment extends Fragment implements View.OnClickListener{
     private Button btn;
-    private SmartTable<EnvironmentInfo> table;
+    private SmartTable<EnvironmentInfoWeek.EnvironmentInfoListBean> table;
     private BaseCheckDialog<TableStyle> chartDialog;
     private QuickChartDialog quickChartDialog;
     private Map<String,Bitmap> map = new HashMap<>();
     private Column<String> nameColumn;
     private Column<String> timeColumn;
+    List<EnvironmentInfoWeek.EnvironmentInfoListBean> testData = new ArrayList<>();;
     private View view;
-
-//    private List<Integer> list = new ArrayList<>(); //数据集合
-//    private String city = "beijing";
-//    private String TAG = "volley";
-//    private String json;
-//    private JSONArray HeWeather6;
-//    private JSONObject now;
-//    private int tmp,pm,hum;
-
-
+    private String TAG = "volley";
+    private int tmp,pm,hum;
+    Boolean isTmp,isPm,isHum,isEvent;
+    private String name,time;
+    private List<String> list = new ArrayList<>();
+    private OpenApiService openApiService = null;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_table, container, false);
 
         initView();
-        initTable();
-//        getEnvironmentInfoList();
+        getEnvironmentInfoList();
         return view;
     }
 
 
-
     public void initView(){
+        openApiService= OpenApiManager.createOpenApiService();
         quickChartDialog = new QuickChartDialog();
         FontStyle.setDefaultTextSize(DensityUtils.sp2px(this.getContext(),15)); //设置全局字体大小
-        table = (SmartTable<EnvironmentInfo>) view.findViewById(R.id.table);
+        table = (SmartTable<EnvironmentInfoWeek.EnvironmentInfoListBean>) view.findViewById(R.id.table);
         btn = view.findViewById(R.id.btn_tb);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,53 +106,45 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
     }
 
     public void getEnvironmentInfoList() {
-        String url = "http://192.168.43.26:8080/shop/queryEnvironmentInfo";
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                "{}",
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject r) {
-                        Log.d("volley", r.toString());
-                        try {
-                            List<EnvironmentInfo> environmentInfoList = new Gson().fromJson(r.getString("EnvironmentInfo").toString(), new TypeToken<List<EnvironmentInfo>>() {
-                            }.getType());
-                            Log.e("6666", "onResponse: "+environmentInfoList.get(0).toString() );
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("volley", error.toString());
-                    }
+
+        Call<EnvironmentInfoWeek> einfo= openApiService.queryEnvironmentInfoWeek();
+
+        //step4:通过异步获取数据
+        einfo.enqueue(new Callback<EnvironmentInfoWeek>() {
+            @Override
+            public void onResponse(Call<EnvironmentInfoWeek> call, Response<EnvironmentInfoWeek> response) {
+                Log.e(TAG, "onResponse: 请求成功！！！" );
+                EnvironmentInfoWeek ef=response.body();
+
+                for(int j=0;j<ef.getEnvironmentInfoList().size();j++){
+                    name = ef.getEnvironmentInfoList().get(j).getEmName();
+                    time = ef.getEnvironmentInfoList().get(j).getWeekTime();
+                    tmp = ef.getEnvironmentInfoList().get(j).getTmp();
+                    hum = ef.getEnvironmentInfoList().get(j).getHum();
+                    pm = ef.getEnvironmentInfoList().get(j).getPm();
+                    isTmp = ef.getEnvironmentInfoList().get(j).isIsTmp();
+                    isPm = ef.getEnvironmentInfoList().get(j).isIsPm();
+                    isHum = ef.getEnvironmentInfoList().get(j).isIsHum();
+                    isEvent = ef.getEnvironmentInfoList().get(j).isIsEvent();
+//                    String emName, int tmp, int hum, int pm, boolean isTmp, boolean isHum,
+//                                       boolean isPm, String dayTime, boolean isEvent
+                    EnvironmentInfoWeek.EnvironmentInfoListBean data =
+                            new EnvironmentInfoWeek.EnvironmentInfoListBean(name,tmp,hum,pm,isTmp,isHum,isPm,
+                            time,isEvent);
+                    testData.add(data);//添加数据进表格
                 }
-        );
-        MyApplication.addRequest(jsonObjectRequest, "getEnvironmentInfoList");
+                initTable();
+            }
+            @Override
+            public void onFailure(Call<EnvironmentInfoWeek> call, Throwable t) {
+                Log.e(TAG, "onFailure: 请求失败！！！！~~~~~" );
+                Log.e(TAG, "onFailure: "+t.getMessage() );
+            }
+        });
     }
 
+//配置表格
     public void initTable(){
-        final List<EnvironmentInfo> testData = new ArrayList<>();
-        Random random = new Random();
-        //测试 从其他地方获取url
-// public UserInfo(String name, int vel, int tmp, int hum, int pm, boolean isTmp, boolean isHum, boolean isPM, long time, Boolean isEvent) {
-        EnvironmentInfo data1 = new EnvironmentInfo("车间1",getStringDateShort(),15,36,70,true,true,false
-                ,false);
-        EnvironmentInfo data2 = new EnvironmentInfo("车间2",getStringDateShort(),35,56,88,false,true,true
-                ,true);
-        EnvironmentInfo data3 = new EnvironmentInfo("车间3",getStringDateShort(),20,36,32,true,false,false
-                ,false);
-        EnvironmentInfo data4 = new EnvironmentInfo("车间4",getStringDateShort(),22,36,68,false,true,true
-                ,true);
-
-        testData.add(data1);
-        testData.add(data2);
-        testData.add(data3);
-        testData.add(data4);
-
 
         nameColumn = new Column<>("车间", "emName");
         nameColumn.setAutoCount(true);
@@ -175,13 +159,14 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
         pmColumn.setAutoCount(true);
 
 
-        timeColumn = new Column<>("日期", "time");
+        timeColumn = new Column<>("日期", "weekTime");
         timeColumn.setAutoCount(true);
+        timeColumn.setFixed(true);
 
         Column<Boolean> column_wd = new Column<>("温度", "isTmp" , new TextImageDrawFormat<Boolean>(size,size, TextImageDrawFormat.RIGHT,10) {
             @Override
             protected Context getContext() {
-                return ParseModeFragment.this.getContext();
+                return WeekTableFragment.this.getContext();
             }
 
             @Override
@@ -196,7 +181,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
         Column<Boolean> column_sd = new Column<>("湿度", "isHum", new TextImageDrawFormat<Boolean>(size,size, TextImageDrawFormat.RIGHT,10) {
             @Override
             protected Context getContext() {
-                return ParseModeFragment.this.getContext();
+                return WeekTableFragment.this.getContext();
             }
 
             @Override
@@ -208,10 +193,10 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-        Column<Boolean> column_pm = new Column<>("PM2.5", "isPM", new TextImageDrawFormat<Boolean>(size,size, TextImageDrawFormat.RIGHT,10) {
+        Column<Boolean> column_pm = new Column<>("PM2.5", "isPm", new TextImageDrawFormat<Boolean>(size,size, TextImageDrawFormat.RIGHT,10) {
             @Override
             protected Context getContext() {
-                return ParseModeFragment.this.getContext();
+                return WeekTableFragment.this.getContext();
             }
 
             @Override
@@ -234,33 +219,6 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
         };
 
 
-//        timeColumn = new Column<>("时间", "time",format);
-//        timeColumn.setCountFormat(new ICountFormat<Long, Long>() {
-//            private long maxTime;
-//            @Override
-//            public void count(Long aLong) {
-//                if(aLong > maxTime){
-//                    maxTime = aLong;
-//                }
-//            }
-//
-//            @Override
-//            public Long getCount() {
-//                return maxTime;
-//            }
-//
-//            @Override
-//            public String getCountString() {
-//                return format.format(maxTime);
-//            }
-//
-//            @Override
-//            public void clearCount() {
-//                maxTime =0;
-//            }
-//        });
-        timeColumn.setFixed(true);
-
         Column totalColumn1 = new Column("日平均监测值",tmpColumn,humColumn,pmColumn);
         Column totalColumn2 = new Column("达标情况",column_wd,column_sd,column_pm);
         Column totalColumn = new Column("监测因子",totalColumn1,totalColumn2);
@@ -268,7 +226,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
         Column<Boolean> countColumn = new Column<>("综合评价", "isEvent", new TextImageDrawFormat<Boolean>(size,size, TextImageDrawFormat.RIGHT,10) {
             @Override
             protected Context getContext() {
-                return ParseModeFragment.this.getContext();
+                return WeekTableFragment.this.getContext();
             }
 
             @Override
@@ -280,7 +238,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-        final TableData<EnvironmentInfo> tableData = new TableData<>("环境监测数据表格",testData,nameColumn,
+        final TableData<EnvironmentInfoWeek.EnvironmentInfoListBean> tableData = new TableData<>("环境监测数据表格",testData,nameColumn,
                 timeColumn,totalColumn,countColumn);
         tableData.setShowCount(true);
         tableData.setShowCount(false);//关闭统计行
@@ -297,7 +255,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
         tableData.setTitleDrawFormat(new TitleImageDrawFormat(size,size, TitleImageDrawFormat.RIGHT,10) {
             @Override
             protected Context getContext() {
-                return ParseModeFragment.this.getContext();
+                return WeekTableFragment.this.getContext();
             }
 
             @Override
@@ -345,7 +303,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
 
             @Override
             public String[] format(Column column, int position) {
-                EnvironmentInfo data = testData.get(position);
+                EnvironmentInfoWeek.EnvironmentInfoListBean data = testData.get(position);
                 String[] strings = {"批注","姓名："+data.getEmName()};
                 return strings;
             }
@@ -361,7 +319,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
 
                     table.setSortColumn(columnInfo.column, !columnInfo.column.isReverseSort());
                 }
-                Toast.makeText(ParseModeFragment.this.getContext(),"点击了"+columnInfo.column.getColumnName(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(WeekTableFragment.this.getContext(),"点击了"+columnInfo.column.getColumnName(),Toast.LENGTH_SHORT).show();
             }
         });
         table.getConfig().setTableTitleStyle(new FontStyle(this.getContext(),15,getResources().getColor(R.color.arc1)).setAlign(Paint.Align.CENTER));
@@ -369,7 +327,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
             @Override
             public int getBackGroundColor(CellInfo cellInfo) {
                 if(cellInfo.row %2 == 0) {
-                    return ContextCompat.getColor(ParseModeFragment.this.getContext(), R.color.content_bg);
+                    return ContextCompat.getColor(WeekTableFragment.this.getContext(), R.color.content_bg);
                 }
                 return TableConfig.INVALID_COLOR;
             }
@@ -380,7 +338,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
             @Override
             public int getBackGroundColor(Integer position) {
                 if(position%2 == 0){
-                    return ContextCompat.getColor(ParseModeFragment.this.getContext(),R.color.arc1);
+                    return ContextCompat.getColor(WeekTableFragment.this.getContext(),R.color.arc1);
                 }
                 return TableConfig.INVALID_COLOR;
 
@@ -390,7 +348,7 @@ public class ParseModeFragment extends Fragment implements View.OnClickListener{
             @Override
             public int getTextColor(Integer position) {
                 if(position%2 == 0) {
-                    return ContextCompat.getColor(ParseModeFragment.this.getContext(), R.color.white);
+                    return ContextCompat.getColor(WeekTableFragment.this.getContext(), R.color.white);
                 }
                 return TableConfig.INVALID_COLOR;
             }
