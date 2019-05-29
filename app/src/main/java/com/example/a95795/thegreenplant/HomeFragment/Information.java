@@ -79,7 +79,7 @@ public class Information extends SupportFragment implements PopupInflaterListene
         super.onViewCreated(view, savedInstanceState);
         set();
         setData();
-        initView();
+       initView();
         pop();
         Context ctx = Information.this.getActivity();
         SharedPreferences sp = ctx.getSharedPreferences("SP", Context.MODE_PRIVATE);
@@ -154,12 +154,12 @@ public class Information extends SupportFragment implements PopupInflaterListene
     }
 
     private void initView() {
-        String url = getString(R.string.ip)+"user/userfindid";
+        String url = getString(R.string.ip)+"user/userall";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.POST,
                 url,
                 "{\n" +
-                        "\t\"id\": "+ID+"\n" +
+                        "\t \"id\": "+ID+"\n" +
                         "}",
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -167,46 +167,46 @@ public class Information extends SupportFragment implements PopupInflaterListene
                         Log.d("volley", response.toString());
                         try {
                             Gson gson = new Gson();
-                            List<User> users = new Gson().fromJson(response.getString("UserList"), new TypeToken<List<User>>() {
+                            List<User> users =  gson.fromJson(response.getString("UserList"), new TypeToken<List<User>>() {
                             }.getType());
+                            mNickName.setRightDesc(users.get(0).getUserName());
+                            mTelephone.setRightDesc(users.get(0).getUserCall().replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
+                            if(users.get(0).getUserWork()==0){
+                                mJob.setRightDesc("生产员");
+                                //mWorkshop.setRightDesc("生产员无管理车间");
+                                mWorkshop.setLeftTitle("工作车间");
+                                mWorkshop.setRightDesc(users.get(0).getUserWorkshop()+"号车间");
+                            }else{
+                                mJob.setRightDesc("管理员");
+                                mWorkshop.setRightDesc(users.get(0).getUserWorkshop()+"号车间");
+                            }
+                            if (users.get(0).getUserSex()==0) {
+                                mSex.setRightDesc("男");
+                                Glide.with(getContext()).load(R.drawable.man)
+                                        .bitmapTransform(new BlurTransformation(getContext(), 25), new CenterCrop(getContext()))
+                                        .into(mHBack);
+                                //设置圆形图像
+                                Glide.with(getContext()).load(R.drawable.man)
+                                        .bitmapTransform(new CropCircleTransformation(getContext()))
+                                        .into(mHHead);
+                            }else{
+                                mSex.setRightDesc("女");
+                                Glide.with(getContext()).load(R.drawable.head)
+                                        .bitmapTransform(new BlurTransformation(getContext(), 25), new CenterCrop(getContext()))
+                                        .into(mHBack);
+                                //设置圆形图像
+                                Glide.with(getContext()).load(R.drawable.head)
+                                        .bitmapTransform(new CropCircleTransformation(getContext()))
+                                        .into(mHHead);
+                            }
+                            name=users.get(0).getUserName();
+                            userid=users.get(0).getUserId();
+                            id=users.get(0).getId()+"";
+                            num=users.get(0).getUserNum();
+                            Date date=users.get(0).getUserFirstjob();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            time=sdf.format(date);
 
-                                    mNickName.setRightDesc(users.get(0).getUserName());
-                                    mTelephone.setRightDesc(users.get(0).getUserCall().replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2"));
-                                    if(users.get(0).getUserWork()==0){
-                                        mJob.setRightDesc("生产员");
-                                        //mWorkshop.setRightDesc("生产员无管理车间");
-                                        mWorkshop.setLeftTitle("工作车间");
-                                        mWorkshop.setRightDesc(users.get(0).getUserWorkshop()+"号车间");
-                                    }else{
-                                        mJob.setRightDesc("管理员");
-                                        mWorkshop.setRightDesc(users.get(0).getUserWorkshop()+"号车间");
-                                    }
-                                    if (users.get(0).getUserSex()==0) {
-                                        mSex.setRightDesc("男");
-                                        Glide.with(getContext()).load(R.drawable.man)
-                                                .bitmapTransform(new BlurTransformation(getContext(), 25), new CenterCrop(getContext()))
-                                                .into(mHBack);
-                                        //设置圆形图像
-                                        Glide.with(getContext()).load(R.drawable.man)
-                                                .bitmapTransform(new CropCircleTransformation(getContext()))
-                                                .into(mHHead);
-                                    }else{
-                                        mSex.setRightDesc("女");
-                                        Glide.with(getContext()).load(R.drawable.head)
-                                                .bitmapTransform(new BlurTransformation(getContext(), 25), new CenterCrop(getContext()))
-                                                .into(mHBack);
-                                        //设置圆形图像
-                                        Glide.with(getContext()).load(R.drawable.head)
-                                                .bitmapTransform(new CropCircleTransformation(getContext()))
-                                                .into(mHHead);
-                                    }
-                                    name=users.get(0).getUserName();
-                                    userid=users.get(0).getUserId();
-                                    id=users.get(0).getId()+"";
-                                    num=users.get(0).getUserNum();
-                                    Date date=users.get(0).getUserFirstjob();
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                    time=sdf.format(date);
 
 
 //                           HocellAdapter myAdapter=new HocellAdapter(producttype,R.layout.hocell);

@@ -129,8 +129,9 @@ public class HomeFragment extends SupportFragment {
 
     private void initViewPager() {
         fragmentList = new ArrayList<>();
-        fragmentList.add(null == environmentFragment ? environmentFragment = EnvironmentFragment.newInstance() : environmentFragment);
+
         fragmentList.add(null == equipmentFragment ? equipmentFragment = EquipmentFragment.newInstance() : equipmentFragment);
+        fragmentList.add(null == environmentFragment ? environmentFragment = EnvironmentFragment.newInstance() : environmentFragment);
         fragmentList.add(null == information ? information = Information.newInstance() : information);
         viewPager.setAdapter(new MyPagerAdapter(getFragmentManager(), fragmentList));
 
