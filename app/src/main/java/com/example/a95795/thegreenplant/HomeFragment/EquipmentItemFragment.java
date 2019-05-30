@@ -270,9 +270,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
 
 
     }
-    public void environment(final View view){
 
-    }
 
     public void init(View view){
         final SecretTextView secretTextView = (SecretTextView) view.findViewById(R.id.detail);
@@ -315,7 +313,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            Toast.makeText(EquipmentItemFragment.this.getActivity(),""+Id,Toast.LENGTH_LONG).show();
+
                             Gson gson = new Gson();
                             final ArrayList<Machine> subjectList = gson.fromJson(response.getJSONArray("Machine").toString(), new TypeToken<List<Machine>>() {
                             }.getType());
@@ -329,7 +327,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                             Date date=subjectList.get(0).getMachineUsetime();
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             textView5.setText((sdf.format(date)));
-                            if (subjectList.get(0).getMachineFs().equals(0)){
+                            if (subjectList.get(0).getMachineFs()==1){
                                 textView6.setText("设备故障");
                             }else {
                                 textView6.setText("设备正常");

@@ -10,6 +10,9 @@ import com.viksaa.sssplash.lib.activity.AwesomeSplash;
 import com.viksaa.sssplash.lib.cnst.Flags;
 import com.viksaa.sssplash.lib.model.ConfigSplash;
 
+/**
+ * 一个启动页
+ */
 public class LaunchActivity extends AwesomeSplash{
 
     @Override

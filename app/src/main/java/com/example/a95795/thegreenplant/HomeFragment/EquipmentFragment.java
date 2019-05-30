@@ -67,7 +67,7 @@ public class EquipmentFragment extends SupportFragment {
     // SpringView
    public SpringView springView;
 
-
+//下拉刷新
     private Handler handler = new Handler(){
 
         @Override
@@ -90,14 +90,18 @@ public class EquipmentFragment extends SupportFragment {
        View view = inflater.inflate(R.layout.fragment_equipment, container, false);
 
 
+       //可以通过缓存数据  来使得全局软件获得数据
         Context ctx = EquipmentFragment.this.getActivity();
         SharedPreferences sp = ctx.getSharedPreferences("SP", MODE_PRIVATE);
         ID = sp.getInt("STRING_KEY", 0);//获取用户id
         int work = sp.getInt("STRING_KEY2", 0);//获取用户是否为管理
 
 
-        judge();judge2();
+        judge();
+
+        judge2();
         springView = (SpringView) view.findViewById(R.id.Spview_spbranchList);
+        //下拉列表
         niceSpinner =  view.findViewById(R.id.nice_spinner);
         initData();initEvnet();replaceFragment(new EquipmentItemFragment());
         List<String> spinnerData = new LinkedList<>(Arrays.asList("一号车间", "二号车间","三号车间","四号车间"));
@@ -105,7 +109,7 @@ public class EquipmentFragment extends SupportFragment {
         niceSpinner.setTextSize(13);
         niceSpinner.setArrowDrawable(R.drawable.jiantou);
 
-
+//监听下拉列表
         niceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -118,6 +122,7 @@ public class EquipmentFragment extends SupportFragment {
         });
         return view;
     }
+
     private void initData() {
 
         springView.setHeader(new DefaultHeader(this.getActivity()));
@@ -149,6 +154,7 @@ public class EquipmentFragment extends SupportFragment {
         });
 
     }
+    //通过id获得用户的全部资料
     public void judge(){
         String url = getString(R.string.ip) + "user/userfindid";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -181,6 +187,7 @@ public class EquipmentFragment extends SupportFragment {
         );
         MyApplication.addRequest(jsonObjectRequest, "MainActivity");
     }
+    //对生产者或者管理员进行区分
     public void judge2(){
         String url = getString(R.string.ip) + "user/userfindid";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(

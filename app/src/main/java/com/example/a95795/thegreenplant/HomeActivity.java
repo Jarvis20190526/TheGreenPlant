@@ -39,7 +39,9 @@ import com.roughike.bottombar.OnMenuTabClickListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import me.yokeyword.fragmentation.SupportActivity;
+import me.yokeyword.fragmentation.SupportFragment;
 
 public class HomeActivity extends SupportActivity
 
@@ -47,9 +49,14 @@ public class HomeActivity extends SupportActivity
     SecretTextView secretTextView;
     ImageView imageView;
 
-    public static HomeActivity newInstance() {
-        return new HomeActivity();
-    }
+    public static final int FIRST = 0;
+    public static final int SECOND = 1;
+    public static final int THIRDLY = 2;
+    private int postion = 0;
+
+
+    private SupportFragment[] mFragments = new SupportFragment[3];
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,19 +66,45 @@ public class HomeActivity extends SupportActivity
         imageView = findViewById(R.id.imageView3);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
+        //沉浸式状态栏
         StatusBarCompat.compat(this, Color.parseColor("#FF16A295"));
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //这里基本都是侧滑菜单
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        loadRootFragment(R.id.home, HomeFragment.newInstance()); //activity初始加载HomeFragment
+        SupportFragment firstFragment = findFragment(HomeFragment.class);
+        if (firstFragment == null) {
+            mFragments[FIRST] = HomeFragment.newInstance();
+            mFragments[SECOND] = AboutFragment.newInstance();
+            mFragments[THIRDLY] = WorkshopInformationFragment.newInstance();
+
+            loadMultipleRootFragment(R.id.home, FIRST,
+                    mFragments[FIRST],
+                    mFragments[SECOND],
+                    mFragments[THIRDLY]);
+
+        } else {
+            // 这里库已经做了Fragment恢复,所有不需要额外的处理了, 不会出现重叠问题
+
+            // 这里我们需要拿到mFragments的引用
+            mFragments[FIRST] = firstFragment;
+            mFragments[SECOND] = findFragment(AboutFragment.class);
+            mFragments[THIRDLY] = findFragment(WorkshopInformationFragment.class);
+
+        }
+
+
+
+        //使用开源控件SecretTextView实现文字的渐变
         secretTextView = (SecretTextView)findViewById(R.id.textView);
         secretTextView.setDuration(1000);
         secretTextView.setIsVisible(true);
+        //实时视图的按钮
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +117,7 @@ public class HomeActivity extends SupportActivity
 
     }
 
-
+//一个简单的退出软件提示
     @Override
     public void onBackPressedSupport() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -108,31 +141,50 @@ public class HomeActivity extends SupportActivity
 
         }
     }
+    //侧滑菜单的点击事件
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if(id==R.id.homeitem){
+            showHideFragment(mFragments[0], mFragments[postion]);
+            postion = 0;
+        } else if (id == R.id.nav_camera) {
 
-        if (id == R.id.nav_camera) {
-            Toast.makeText(HomeActivity.this, "123", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_gallery) {
-
+            showHideFragment(mFragments[2], mFragments[postion]);
+            test(4);
+            postion = 2;
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
-
+            showHideFragment(mFragments[1], mFragments[postion]);
+            postion = 1;
+            test(5);
         } else if (id == R.id.nav_send) {
-            start(new AboutFragment());
+            new SweetAlertDialog(HomeActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                    .setContentText("您的版本已经是最新版1.0")
+                    .setConfirmText("确定")
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sDialog) {
+                            sDialog.dismissWithAnimation();
+                        }
+                    })
+                    .show();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    //设置顶部标题的修改
     public void test(int number) {
         switch (number) {
             case 1:
@@ -155,12 +207,22 @@ public class HomeActivity extends SupportActivity
                 secretTextView.hide();
                 secretTextView.setText("个人中心");
                 secretTextView.show();
+            case 4:
+                imageView.setVisibility(View.GONE);
+                secretTextView.hide();
+                secretTextView.setText("车间人员信息");
+                secretTextView.show();
+            case 5:
+                imageView.setVisibility(View.GONE);
+                secretTextView.hide();
+                secretTextView.setText("关于车间");
+                secretTextView.show();
             default:
                 break;
         }
     }
 
-
+//一个简单的fragment跳转 使用replace
     public void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -168,6 +230,8 @@ public class HomeActivity extends SupportActivity
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
+
 
 
 }

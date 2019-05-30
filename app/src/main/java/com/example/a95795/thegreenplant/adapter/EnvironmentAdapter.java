@@ -29,11 +29,15 @@ import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static com.nightonke.jellytogglebutton.JellyTypes.Jelly.ACTIVE_TREMBLE_BODY_SLIM_JIM;
+
+/**
+ * listview的适配器
+ */
 public class EnvironmentAdapter extends ArrayAdapter<Machine> {
     public List<Machine> list;
     public int workid;
     private int resourceId;
-
+//重写适配器
     public EnvironmentAdapter(Context context, int textViewResourceId, List<Machine> objects,int work) {
         super(context, textViewResourceId, objects);
         this.resourceId = textViewResourceId;
@@ -52,6 +56,7 @@ public class EnvironmentAdapter extends ArrayAdapter<Machine> {
         JellyToggleButton jellyToggleButton = (JellyToggleButton) view.findViewById(R.id.JellyToggleButton);
         ImageView imageView1 = (ImageView) view.findViewById(R.id.imageView2);
         textView.setText(machine.getMachineType());
+        //简单设置图片
         switch (machine.getMachineType()) {
             case "EHUM":
                 //设备图片
@@ -71,6 +76,7 @@ public class EnvironmentAdapter extends ArrayAdapter<Machine> {
         EnvironmentAdapter.EquipmentNow equipmentNow = new EnvironmentAdapter.EquipmentNow(position);
         final EnvironmentAdapter.MyListener myListener = new EnvironmentAdapter.MyListener(position, getContext().getString(R.string.ip), list.get(position).getMachineId());
 
+        //使用jellyToggleButton开源控件 实现果冻化按钮
         //判断设备状况
         if ((list.get(position).getMachineFs() == 1)) {
             jellyToggleButton.setCheckedImmediately(false, false);
@@ -135,7 +141,7 @@ public class EnvironmentAdapter extends ArrayAdapter<Machine> {
             IP = ip;
             MachineId = machineId;
         }
-
+//设置按钮在左边需要发送的事件
         public void left() {
             String url = IP + "user/MachineUpdata";
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -161,7 +167,7 @@ public class EnvironmentAdapter extends ArrayAdapter<Machine> {
             );
             MyApplication.addRequest(jsonObjectRequest, "MainActivity");
         }
-
+//控件在右边的事件
         public void right() {
             String url = IP + "user/MachineUpdata";
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(

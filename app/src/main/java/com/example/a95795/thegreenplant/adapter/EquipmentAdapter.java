@@ -47,6 +47,9 @@ import static com.nightonke.jellytogglebutton.JellyTypes.Jelly.LAZY_TREMBLE_TAIL
  * Created by 95795 on 2019-05-17.
  */
 
+/**
+ * 一个 BaseExpandableListA的适配器
+ */
 public class EquipmentAdapter extends BaseExpandableListAdapter {
     public String[] groupString = {"电机（PRO）"};
     public String[][] childString = new String[1][3];
@@ -161,7 +164,7 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
             IP = ip;
             MachineId = machineId;
         }
-
+//同listview方法
         public void left() {
             String url = IP+"user/MachineUpdata";
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -296,6 +299,7 @@ public class EquipmentAdapter extends BaseExpandableListAdapter {
             GroupPosition = groupPosition;
             ChildPosition = childPosition;
         }
+
 
         @Override
         public void onClick(View v) {

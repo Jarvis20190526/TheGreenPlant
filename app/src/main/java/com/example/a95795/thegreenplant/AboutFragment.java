@@ -10,27 +10,36 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import me.yokeyword.fragmentation.ISupportFragment;
+import me.yokeyword.fragmentation.SwipeBackLayout;
 import me.yokeyword.fragmentation_swipeback.SwipeBackFragment;
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 
+/**
+ * 这是一个简单的关于页面
+ */
 public class AboutFragment extends SwipeBackFragment implements ISupportFragment {
 
-    private Toolbar toolbar;
     private RelativeLayout relativeLayout;
+
+    public static AboutFragment newInstance() {
+        return new AboutFragment();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_about, null);
+
         return attachToSwipeBack(view);
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initViews();
+        initViews(view);
         View aboutPage = new AboutPage(getContext())
                 .isRTL(false)
                 .setImage(R.drawable.ic_leaf)//图片
@@ -45,15 +54,9 @@ public class AboutFragment extends SwipeBackFragment implements ISupportFragment
         relativeLayout.addView(aboutPage);
     }
 
-    private void initViews(){
-        relativeLayout=getActivity().findViewById(R.id.relativeLayout);
-        toolbar= (Toolbar) getActivity().findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar=((AppCompatActivity) getActivity()).getSupportActionBar();
-        if(actionBar!=null){
-  //          actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        toolbar.setTitle("关于");
+    private void initViews(View view){
+        relativeLayout=view.findViewById(R.id.relativeLayout);
+
     }
 
 //    @Override

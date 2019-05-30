@@ -9,7 +9,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface OpenApiService {
-    public static final  String BASE_URL="http://172.20.10.6:8080/";
+    public static final  String BASE_URL="http://192.168.43.26:8080/";
 
     //查询全部环境详情 日
     @GET("user/queryEnvironmentInfoDay")
