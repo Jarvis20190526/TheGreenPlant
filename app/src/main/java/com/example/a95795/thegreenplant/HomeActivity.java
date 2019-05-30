@@ -153,6 +153,10 @@ public class HomeActivity extends SupportActivity
         if(id==R.id.homeitem){
             showHideFragment(mFragments[0], mFragments[postion]);
             postion = 0;
+            secretTextView.hide();
+            secretTextView.setText("首页");
+            secretTextView.show();
+
         } else if (id == R.id.nav_camera) {
 
         } else if (id == R.id.nav_gallery) {
@@ -207,16 +211,19 @@ public class HomeActivity extends SupportActivity
                 secretTextView.hide();
                 secretTextView.setText("个人中心");
                 secretTextView.show();
+                break;
             case 4:
                 imageView.setVisibility(View.GONE);
                 secretTextView.hide();
                 secretTextView.setText("车间人员信息");
                 secretTextView.show();
+                break;
             case 5:
                 imageView.setVisibility(View.GONE);
                 secretTextView.hide();
                 secretTextView.setText("关于车间");
                 secretTextView.show();
+                break;
             default:
                 break;
         }

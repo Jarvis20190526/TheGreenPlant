@@ -179,6 +179,7 @@ public class EquipmentItemFragment extends SupportFragment implements PopupInfla
                             expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                                 @Override
                                 public boolean onGroupClick(final ExpandableListView expandableListView, View view, int groupPosition, long l) {
+                                   //设置列表不可以快速点击
                                     expandableListView.setEnabled(false);
                                     new Handler().postDelayed(new Runnable() {
                                         @Override
